@@ -1,0 +1,130 @@
+<script src="../../../../../../vue/h5/src/router/routers.js"></script>{include file="public/header" /}
+
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户管理 <span class="c-gray en">&gt;</span> 认证列表 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+    <form action="" method="get">
+        <div class="text-c">
+            <span class="select-box inline">
+            <select name="status" class="select">
+                <option value="">=状态=</option>
+                {foreach $info as $f}
+						<option value="{$f['type']}" {if condition=" input('get.status') eq $f['type']"}selected{/if} >{$f['name']}</option>
+                {/foreach}
+            </select>
+            </span>
+            &nbsp;日期范围：
+            <input type="text" onfocus="WdatePicker()" readonly name="start" value="{:input('get.start')}" class="input-text Wdate" style="width:120px;">
+            -
+            <input type="text" onfocus="WdatePicker()" readonly name="end" value="{:input('get.start')}" class="input-text Wdate" style="width:120px;">
+            <input type="text" class="input-text" style="width:250px" placeholder="用户ID"
+                   value="{:input('word')}" name="word">
+            <button type="submit" class="btn btn-success radius"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+        </div>
+    </form>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+
+        <span class="r">共有数据：<strong id="count">{$list->count()}</strong> 条</span> </div>
+    <div class="mt-20">
+
+        <table class="table table-border table-bordered table-hover table-bg table-sort">
+            <thead>
+            <tr class="text-c">
+                <th width="50">用户ID</th>
+                <th width="80">用户名</th>
+                <th width="80">手机号</th>
+                <th width="100">营业执照<br>[点击放大]</th>
+                <th width="100">法人身份证<br>[点击放大]</th>
+                <th width="100">公司照片<br>[点击放大]</th>
+                <th width="100">申请时间</th>
+                <th width="60">状态</th>
+                <th width="120">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {volist name="list" id="v"}
+            <tr class="text-c" id="tr{$v.user_id}">
+                <td>{$v.user_id}</td>
+                <td>{$v.username}</td>
+                <td>{$v.phone}</td>
+                <td style="padding: 0"><img src="{$v.license}" style="width: 55px;height: 70px;" onclick="showimgmm('{$v.license}')"></td>
+                <td style="padding: 0"><img src="{$v.legalperson}" style="width: 55px;height: 70px;" onclick="showimgmm('{$v.legalperson}')"></td>
+                <td style="padding: 0"><img src="{$v.company}" style="width: 55px;height: 70px;" onclick="showimgmm('{$v.company}')"></td>
+                <td>{$v.created}</td>
+                <td>
+                    {switch name="$v.status"}
+                    {case value="0"} <span class="label label-default radius">未审核</span> {/case}
+                    {case value="1"} <span class="label label-primary radius">已认证</span> {/case}
+                    {case value="2"} <span class="label label-default radius">已驳回</span> {/case}
+                    {/switch}
+                </td>
+                <td class="td-manage">
+                    {switch name="$v.status"}
+                    {case value="0"}
+                    <a style="text-decoration:none" class="btn btn-primary ml-5" onclick="member_sta(this,{$v['user_id']},1)"  href="javascript:void(0);" title="通过"><i class="Hui-iconfont">&#xe615;</i></a>
+                    <a style="text-decoration:none" class="btn btn-warning ml-5" onclick="member_sta(this,{$v['user_id']},2)" title="驳回"><i class="Hui-iconfont">&#xe60b;</i></a>
+
+                     {/case}
+                    {/switch}
+                    <a style="text-decoration:none" class="btn btn-danger ml-5" onclick="member_del(this,{$v['user_id']})" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>
+
+                </td>
+            </tr>
+            {/volist}
+            </tbody>
+        </table>
+
+        <div class="page">
+            {:htmlspecialchars_decode($list->render())}
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    /*放大图片*/
+
+    function member_img(title,url,w,h){
+        layer_show(title,url,w,h);
+    }
+
+    /*产品-删除*/
+    function member_del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            $.post("/user/user_company_del",{id:id},function(data){
+                if(data.status == 'y'){
+                    layer.msg(data.info,{icon:1,time:3000});
+                    $(obj).parents("tr").remove();
+                    $("#count").text(data.count);
+                }else{
+                    layer.msg(data.info,{icon:2,time:3000});
+                }
+            },'json');
+        });
+    }
+
+
+    function member_sta(obj,id,status){
+        layer.confirm('确认要修改吗？',function(index){
+            $.post("{:url('user_company_sta')}",{id:id,status:status},function(data){
+                layer.msg(data.info,{icon:1,time:1000});
+                window.location.reload();
+            },'json');
+        });
+    }
+
+    function show_address(info){
+        layer.msg(info,{icon:2,time:1000});
+    }
+
+    function showimgmm(imgs){
+        layer.open({
+            type: 1,
+            title: false,
+            area: ['450px', '600px'],
+            shadeClose: true,
+            skin: 'layui-layer-nobg', //没有背景色
+            content: "<img src='"+imgs+"' style='width: 450px;height: 600px;'>"
+        });
+    }
+</script>
+{include file="public/footer"}

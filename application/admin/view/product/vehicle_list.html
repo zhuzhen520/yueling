@@ -1,0 +1,193 @@
+{include file="public/header" /}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 车辆管理 <span class="c-gray en">&gt;</span> 所有车辆  <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+	<form action="" method="get">
+		<div class="text-c">
+
+			日期范围：
+			<input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.start')}" name="start" id="datemin" class="input-text Wdate" style="width:120px;" readonly> -
+			<input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.end')}" name="end" id="datemin" class="input-text Wdate" style="width:120px;" readonly>
+			<input type="text" class="input-text" style="width:250px" placeholder="商品名称" value="{:input('get.word')}" name="word">
+			<button type="submit" class="btn btn-success radius"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+		</div>
+	</form>
+
+	<div class="cl pd-5 bg-1 bk-gray mt-20">
+		<span class="l">
+			<a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a>
+			<a href="javascript:;" onClick="new_open('添加/编辑','/product/vehicle_add?id=0')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加车辆</a></span>
+
+		<span class="r">共有数据：<strong id="count">{$count}</strong> 条</span> </div>
+	<div class="mt-20">
+		<table class="table table-border table-bordered table-hover table-bg table-sort">
+			<thead>
+			<tr class="text-c">
+				<th width="25"><input type="checkbox" name="" value=""></th>
+				<th width="80">ID</th>
+				<th width="100">图片<br>[点击放大]</th>
+				<th width="100">商品名称 </th>
+				<th width="100">价格区间(万)</th>
+				<th width="150">品牌</th>
+				<th width="100">变速箱</th>
+				<th width="100">排量</th>
+				<th width="100">类型</th>
+				<th width="100">尺寸</th>
+				<th width="100">km/h加速/<br>动力</th>
+				<th width="180">添加时间</th>
+				<th width="60">是否热门</th>
+				<th width="100">分期推荐/<br>分期类型</th>
+				<th width="150">操作</th>
+			</tr>
+			</thead>
+			<tbody>
+			{volist name="list" id="v"}
+			<tr class="text-c" id="tr{$v.id}">
+				<td><input type="checkbox" value="{$v.id}" name="del[]"></td>
+				<td>{$v.id}</td>
+				<td><img src="{$v.img}" style="width: 100px;height: 65px;" onclick="showimg('{$v.img}')"></td>
+				<td>{$v.name}</td>
+				<td>{$v.min_price} - {$v.max_price} </td>
+				<td>
+					<img src="{$v.logo}" style="width: 40px;height: 40px;" onclick="showimg('{$v.logo}')"><br>
+					{$v.carname}
+				</td>
+				<td>
+					{if condition="$v.speed eq  0 "}
+						手动
+					{else/}
+						自动
+					{/if}
+				</td>
+				<td>{$v.pailiang}-{$v.max_pailiang}</td>
+				<td>{:cartype($v.car_type)}</td>
+				<td>长:{$v.car_length}<br>
+					宽:{$v.car_width}<br>
+					高:{$v.car_height}
+				</td>
+				<td>{$v.accelerator}<br>
+				    {$v.power}
+				</td>
+				<td>{$v.add_time}</td>
+				<td>
+					<!-- <img src="\static\admin\static\h-ui\images\validform\iconpic-{$v['is_hot']!=0?'right':'error'}.png" style="cursor:pointer;" onclick="tog_status(this,{$v.id},{$v.is_hot},'vehicle','is_hot')"> -->
+					<img src="/static/Admin/images/icon_{$v['is_hot']==1?'right':'error'}_s.png" style="cursor:pointer;" onclick="tog_status(this,{$v.id},{$v.is_hot},'vehicle','is_hot')">
+
+				</td>
+				<td>
+					<!-- <img src="\static\admin\static\h-ui\images\validform\iconpic-{$v['fenqi']!=0?'right':'error'}.png" style="cursor:pointer;" onclick="tog_status(this,{$v.id},{$v.fenqi},'vehicle','fenqi')"> -->
+					<img src="/static/Admin/images/icon_{$v['fenqi']==1?'right':'error'}_s.png" style="cursor:pointer;" onclick="tog_status(this,{$v.id},{$v.fenqi},'vehicle','fenqi')">
+
+					<br>
+					<br>
+					{$v.fq_type}
+				</td>
+				<td class="td-manage">
+
+					<a style="text-decoration:none" class="btn btn-success ml-5" onClick="new_open('添加/编辑','/product/vehicle_add?id={$v['id']}')" href="javascript:void(0);" title="编辑"><i class="Hui-iconfont">&#xe6df;</i></a>
+					<a style="text-decoration:none" class="btn btn-danger ml-5" onclick="member_del(this,{$v['id']})" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>
+ 			</tr>
+			{/volist}
+			</tbody>
+		</table>
+		<div class="page text-r mt-10">
+			{:htmlspecialchars_decode($list->render())}
+		</div>
+	</div>
+</div>
+{include file="public/footer"}
+<script>
+	function showimg(imgs){
+		layer.open({
+			type: 1,
+			title: false,
+			area: ['750px', '487px'],
+			shadeClose: true,
+			skin: 'layui-layer-nobg', //没有背景色
+			content: "<img src='"+imgs+"' style='width: 750px;height: 487px;;'>"
+		});
+	}
+
+	function tog_status(obj,id,status,table,field){
+		var news_status = status == 1 ? 0 : 1;
+		if(typeof(field) == 'undefined'){
+			field = 'is_show';
+		}
+		$.post("<?php echo url('Base/toggle_status'); ?>",{id:id,status:news_status,table,field:field},function(data){
+			if(data == 1){
+				layer.msg('操作成功!',{icon:6,time:1000});
+				if(news_status == 0){
+					src="/static/Admin/static/h-ui/images/validform/iconpic-error.png";
+				}else{
+					src="/static/Admin/static/h-ui/images/validform/iconpic-right.png";
+				}
+				$(obj).attr('src',src).attr('onclick',"toggle_status(this,"+id+","+news_status+",'"+table+"','"+field+"')");
+			}else{
+				layer.msg('操作失败了!',{icon:5,time:1000});
+			}
+		});
+	}
+
+	/*显示隐藏切换*/
+	function toggle_status(obj,id,status,table,field){
+		var news_status = status == 1 ? 0 : 1;
+		if(typeof(field) == 'undefined'){
+			field = 'is_show';
+		}
+		$.post("<?php echo url('Base/toggle_status'); ?>",{id:id,status:news_status,table,field:field},function(data){
+			if(data == 1){
+				layer.msg('操作成功!',{icon:6,time:1000});
+				if(news_status == 1){
+					src="/static/Admin/static/h-ui/images/validform/iconpic-right.png";
+				}else{
+					src="/static/Admin/static/h-ui/images/validform/iconpic-error.png";
+				}
+				$(obj).attr('src',src).attr('onclick',"toggle_status(this,"+id+","+news_status+",'"+table+"','"+field+"')");
+			}else{
+				layer.msg('操作失败了!',{icon:5,time:1000});
+			}
+		});
+	}
+	/*产品-删除*/
+	function member_del(obj,id){
+		layer.confirm('确认要删除吗？',function(index){
+			$.post("/product/vehicle_del",{id:id},function(data){
+				if(data.status == 'y'){
+					layer.msg(data.info,{icon:1,time:3000});
+					$(obj).parents("tr").remove();
+					$("#count").text(data.count);
+				}else{
+					layer.msg(data.info,{icon:2,time:3000});
+				}
+			},'json');
+		});
+	}
+
+	//批量删除
+	function datadel(){
+		var id='';
+		$("input[name='del[]']:checked").each(function(){
+			id += $(this).val()+',';
+		});
+
+		if(id == ''){
+			layer.msg('还没选择!',{icon:2,time:1000});
+			return false;
+		}
+		layer.confirm('确认要删除吗？',function(index){
+			$.post("/product/vehicle_del",{id:id},function(data){
+				if(data.status == 'y'){
+					//循环当前选择的框
+					$("input[name='del[]']:checked").each(function(){
+						//删除当前选择的框
+						$(this).parents('tr').remove();
+					});
+					layer.msg(data.info+'删除数量:'+data.count,{icon:1,time:3000});
+					$("#count").text(data.count);
+				}else{
+					layer.msg(data.info,{icon:2,time:3000});
+				}
+			});
+		});
+	}
+</script>

@@ -1,0 +1,55 @@
+{include file="public/header"}
+<nav class="breadcrumb">
+    <i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 价格走势 <span class="c-gray en">&gt;</span>
+    列表
+    <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div style="">
+    <div style="width: 1000px" location="right" class="calendar_btn" name="calendar" id="calendar"></div>
+</div>
+<link href="/static/layui/css/datepicker.css" rel="stylesheet"/>
+<style>
+    .calendar{
+        margin:5%;
+    }
+</style>
+{include file="public/footer"}
+<script src="/static/layui/zlDate.js"></script>
+<script>
+    /**
+     * 修改价格
+     * @param date
+     * @param newPrice
+     * @param calendarPrice
+     */
+    function changePrice(date, newPrice, calendarPrice) {
+        var params = {
+            date: date,
+            price: newPrice
+        };
+        $.post("{:url('input')}", params, function (data) {
+            console.log(data);
+            if (data.status == 0) {
+                calendarPrice.html('<dfn>¥</dfn>' + newPrice);
+                calendarPrice.show();
+            } else {
+                alert("修改失败！");
+            }
+        });
+    }
+
+    var year = (new Date()).getFullYear();
+    var month = (new Date()).getMonth() + 1;
+    date(year + '-' + month);
+
+    function date(date) {
+        $.post("{:url('getm')}", {date: date}, function (data) {
+            console.log(data);
+            pickerEvent.setPriceArr(data);
+            pickerEvent.Init($('#calendar'));
+        });
+    }
+</script>
+
+

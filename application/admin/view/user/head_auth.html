@@ -1,0 +1,125 @@
+{include file="public/header" /}
+
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户管理 <span class="c-gray en">&gt;</span> 认证列表 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+    <form action="" method="get">
+        <div class="text-c">
+            <input type="text" class="input-text" style="width:250px" placeholder="用户ID|用户名"
+                   value="{:input('word')}" name="word">
+            <button type="submit" class="btn btn-success radius"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+        </div>
+    </form>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+
+        <span class="r">共有数据：<strong id="count">{$list->count()}</strong> 条</span> </div>
+    <div class="mt-20">
+
+        <table class="table table-border table-bordered table-hover table-bg table-sort">
+            <thead>
+            <tr class="text-c">
+
+                <th width="50">用户ID</th>
+                <th width="80">用户名</th>
+                <th width="80">当前图片</th>
+                <th width="80">申请更新头像</th>
+                <th width="120">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {volist name="list" id="v"}
+            <tr class="text-c" id="tr{$v.id}">
+                <td>{$v.id}</td>
+                <td>{$v.name}</td>
+                <td>
+                    {if condition="empty($v.avatar)"}
+                    <img src="/uploads/img/enheng.jpg" style="width: 40px;height: 40px;" onclick="showimg('/uploads/img/enheng.jpg')">
+                    {else/}
+                    <img src="{$v.avatar}" style="width: 40px;height: 40px;" onclick="showimg('{$v.avatar}')">
+                    {/if}
+                </td>
+                <td><img src="{$v.img_apply}" style="width: 40px;height: 40px;" onclick="showimg('{$v.img_apply}')"></td>
+
+                <td class="td-manage">
+
+                    <a style="text-decoration:none" class="btn btn-primary ml-5" onclick="head_status(this,{$v['id']},1)"  href="javascript:void(0);" title="通过"><i class="Hui-iconfont">&#xe615;</i></a>
+                    <a style="text-decoration:none" class="btn btn-warning ml-5" onclick="head_status(this,{$v['id']},2)" title="驳回"><i class="Hui-iconfont">&#xe60b;</i></a>
+
+                </td>
+            </tr>
+            {/volist}
+            </tbody>
+        </table>
+
+        <div class="page">
+            {:htmlspecialchars_decode($list->render())}
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/mar/BenzAMRRecorder.js"></script>
+<script type="text/javascript">
+    function head_status(obj,id,status){
+        layer.confirm('确认要修改吗？',function(index){
+            $.post("{:url('head_status')}",{id:id,status:status},function(data){
+                layer.msg(data.info,{icon:1,time:1000});
+                window.location.reload();
+            },'json');
+        });
+    }
+
+    function play(voie){
+        var amr = new BenzAMRRecorder();
+        amr.initWithUrl(voie).then(function() {
+            amr.play();
+        });
+        amr.onEnded(function() {
+            layer.msg('播放完毕',{icon:1,time:3000});
+        })
+    }
+
+    /*放大图片*/
+
+    function member_img(title,url,w,h){
+        layer_show(title,url,w,h);
+    }
+
+    /*产品-删除*/
+    function member_del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            $.post("/user/user_skill_del",{id:id},function(data){
+                if(data.status == 'y'){
+                    layer.msg(data.info,{icon:1,time:3000});
+                    $(obj).parents("tr").remove();
+                    $("#count").text(data.count);
+                }else{
+                    layer.msg(data.info,{icon:2,time:3000});
+                }
+            },'json');
+        });
+    }
+
+
+    function member_sta(obj,id,status){
+        layer.confirm('确认要修改吗？',function(index){
+            $.post("{:url('user_skill_sta')}",{id:id,status:status},function(data){
+                layer.msg(data.info,{icon:1,time:1000});
+                window.location.reload();
+            },'json');
+        });
+    }
+
+    function show_address(info){
+        layer.msg(info,{icon:2,time:1000});
+    }
+
+    function showimgmm(imgs){
+        layer.open({
+            type: 1,
+            title: false,
+            area: ['500px', '500px'],
+            shadeClose: true,
+            skin: 'layui-layer-nobg', //没有背景色
+            content: "<img src='"+imgs+"' style='width: 500px;height: 500px;'>"
+        });
+    }
+</script>
+{include file="public/footer"}

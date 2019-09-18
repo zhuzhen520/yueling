@@ -1,0 +1,39 @@
+{include file="public/header" /}
+<style>
+    .withm{width: 50%}
+    .selectwith{width: 30%}
+    .upload-img{position:relative;}
+    .upload-img input{opacity: 0;border: 1px solid red;width: 177px;height: 164px;position: absolute;z-index: 1;}
+</style>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="form-add">
+
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2" style="width: 110px"><span class="c-red">*</span>发货状态：</label>
+            <div class="formControls col-xs-8 col-sm-9" style="width: 200px">
+                <select name="shipping_state" class="select input-text withm" {if condition="$shipping_state != 0"}disabled="disabled"{/if}  >
+                    <option value="0"  {if condition="$shipping_state == 0"}selected{/if} >未发货</option>
+                    <option value="1"  {if condition="$shipping_state == 1"}selected{/if}>已发货</option>
+                    <option value="2"  {if condition="$shipping_state == 2"}selected{/if}>已收货</option>
+                </select>
+            </div>
+            <div class="col-4"> </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"  style="width: 110px"><span class="c-red">*</span>物流编号：</label>
+            <div class="formControls col-xs-8 col-sm-9" style="width: 250px">
+                <input type="text" class="input-text" placeholder="物流编号" value="{$wlbh}" name="wlbh" >
+            </div>
+            <div class="col-4"> </div>
+        </div>
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input type="hidden" value="{$order_id}" name="uid">
+                <input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+            </div>
+        </div>
+    </form>
+</article>
+
+{include file="public/footer" /}

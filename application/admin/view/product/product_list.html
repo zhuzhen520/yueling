@@ -1,0 +1,128 @@
+{include file="public/header" /}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 商城管理 <span class="c-gray en">&gt;</span> 商城列表 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+	<form action="" method="get">
+		<div class="text-c">
+
+			日期范围：
+			<input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.start')}" name="start" id="datemin" class="input-text Wdate" style="width:120px;" readonly> -
+			<input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.end')}" name="end" id="datemin" class="input-text Wdate" style="width:120px;" readonly>
+			<input type="text" class="input-text" style="width:250px" placeholder="商品名称" value="{:input('get.word')}" name="word">
+			<button type="submit" class="btn btn-success radius"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+		</div>
+	</form>
+
+	<div class="cl pd-5 bg-1 bk-gray mt-20">
+		<span class="l">
+			<a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a>
+			<a href="javascript:;" onClick="new_open('添加/编辑','/product/product_add?id=0')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加产品</a></span>
+
+		<span class="r">共有数据：<strong id="count">{$count}</strong> 条</span> </div>
+	<div class="mt-20">
+		<table class="table table-border table-bordered table-hover table-bg table-sort">
+			<thead>
+			<tr class="text-c">
+				<th width="25"><input type="checkbox" name="selectAll" value=""></th>
+				<th width="40">ID</th>
+				<th width="60">图片<br>[点击放大]</th>
+				<th width="100">商品名称 </th>
+				<th width="150">简介</th>
+				<th width="100">价格</th>
+				<!--<th width="100">运费</th>-->
+				<th width="100">库存</th>
+				<!--<th width="100">支付类型</th>-->
+				<th width="150">添加时间</th>
+				<th width="50">是否上架</th>
+				<th width="150">操作</th>
+			</tr>
+			</thead>
+			<tbody>
+			{volist name="list" id="v"}
+			<tr class="text-c" id="tr{$v.id}">
+				<td><input type="checkbox" value="{$v.id}" name="del[]"></td>
+				<td>{$v.id}</td>
+				<td><img src="{$v.thumb}" style="width: 100px;height: 65px;" onclick="showimg('{$v.thumb}')"></td>
+				<td>{$v.name}</td>
+				<td>{$v.short_name}</td>
+				<td>{:floatval($v.shop_price)}</td>
+				<!--<td>{$v.freight}</td>-->
+				<td>{$v.stock}</td>
+				<!--<td>{:currencytype($v.pay_type)}</td>-->
+				<td>{$v.add_time}</td>
+
+				<td>
+					<div class="check-box">
+						<input type="checkbox" id="sale-1" name="is_sale" value="1" {$v.is_sale ==1?'checked':''} disabled = disabled>
+					</div>
+				</td>
+
+				<td class="td-manage">
+
+					<a style="text-decoration:none" class="btn btn-success ml-5" onClick="new_open('添加/编辑','/product/product_add?id={$v['id']}')" href="javascript:void(0);" title="编辑"><i class="Hui-iconfont">&#xe6df;</i></a>
+					<a style="text-decoration:none" class="btn btn-danger ml-5" onclick="member_del(this,{$v['id']})" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>
+ 			</tr>
+			{/volist}
+			</tbody>
+		</table>
+		<div class="page text-r mt-10">
+			{:htmlspecialchars_decode($list->render())}
+		</div>
+	</div>
+</div>
+{include file="public/footer"}
+<script>
+	$('input[name="selectAll"]').on("click",function(){
+		if($(this).is(':checked')){
+			$('input[name="del[]"]').each(function(){
+				$(this).prop("checked",true);
+			});
+		}else{
+			$('input[name="del[]"]').each(function(){
+				$(this).prop("checked",false);
+			});
+		}
+	});
+	/*产品-删除*/
+	function member_del(obj,id){
+		layer.confirm('确认要删除吗？',function(index){
+			$.post("/product/product_del",{id:id},function(data){
+				if(data.status == 'y'){
+					layer.msg(data.info,{icon:1,time:3000});
+					$(obj).parents("tr").remove();
+					$("#count").text(data.count);
+				}else{
+					layer.msg(data.info,{icon:2,time:3000});
+				}
+			},'json');
+		});
+	}
+
+	//批量删除
+	function datadel(){
+		var id='';
+		$("input[name='del[]']:checked").each(function(){
+			id += $(this).val()+',';
+		});
+
+		if(id == ''){
+			layer.msg('还没选择!',{icon:2,time:1000});
+			return false;
+		}
+		layer.confirm('确认要删除吗？',function(index){
+			$.post("/product/product_del",{id:id},function(data){
+				if(data.status == 'y'){
+					//循环当前选择的框
+					$("input[name='del[]']:checked").each(function(){
+						//删除当前选择的框
+						$(this).parents('tr').remove();
+					});
+					layer.msg(data.info+'删除数量:'+data.count,{icon:1,time:3000});
+					$("#count").text(data.count);
+				}else{
+					layer.msg(data.info,{icon:2,time:3000});
+				}
+			});
+		});
+	}
+</script>

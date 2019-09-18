@@ -1,0 +1,142 @@
+{include file="public/header" /}
+<style>
+    .withm{width: 50%}
+    .selectwith{width: 30%}
+    .otherwith{width: 15%}
+    .upload-img{position:relative;}
+    .upload-img input{opacity: 0;border: 1px solid red;width: 177px;height: 164px;position: absolute;z-index: 1;}
+</style>
+<script type="text/javascript" src="/static/ueditor/1.4.3/ueditor.config.js"></script>
+<script type="text/javascript" src="/static/ueditor/1.4.3/ueditor.all.min.js"> </script>
+<script type="text/javascript" src="/static/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+<body>
+<div class="pd-20">
+  <form action="" method="post" class="form form-horizontal" id="form-add">
+
+
+      <div class="row cl">
+          <label class="form-label col-xs-2 col-sm-2">
+              <span class="c-red">*</span>问题：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <textarea name="content" cols="" rows="" class="textarea"  placeholder="问题">{$online['content']}</textarea>
+              </div>
+
+              <div class="col-4"> </div>
+      </div>
+      <!--<div class="row cl">-->
+        <!--<div class="formControls col-10">-->
+            <!--<textarea name="content_admin" cols="" rows="" class="textarea"  placeholder="答案"></textarea>-->
+        <!--</div>-->
+    <!--</div>-->
+      <div class="row cl">
+          <label class="form-label col-xs-2 col-sm-2">
+              <span class="c-red">*</span>回复：</label>
+          <div class="formControls col-xs-8 col-sm-9">
+              <script id="editor" type="text/plain" style="width:100%;height:400px;">{:htmlspecialchars_decode($online['content_admin'])}</script>
+          </div>
+          <div class="col-4"> </div>
+      </div>
+
+      <div class="row cl">
+              <label class="form-label col-xs-2 col-sm-2">
+              <span class="c-red">*</span> </label>
+          <div class="formControls col-xs-8 col-sm-9">
+              <input type="hidden" value="{$online['id']}" name="id">
+
+              <input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+          </div>
+          <div class="col-4"> </div>
+      </div>
+  </form>
+</div>
+</div>
+
+</body>
+</html>
+              {include file="public/footer" /}
+
+              <script type="text/javascript">
+                  function gradeChange(type){
+                      $.post("/product/catlist",{cat_id:type},function(data){
+                          if(data.info.length > 0){
+                              var str = '';
+                              for(var i = 0; i< data.info.length; i++){
+                                  str += '<option value="'+data.info[i]['cat_id']+'">'+data.info[i]['cat_name']+'</option> ';
+                              }
+                              var sem =
+                                  '<div class="row cl"> ' +
+                                  '<label class="form-label col-xs-2 col-sm-2"> ' +
+                                  '<span class="c-red">*</span>级别：</label> ' +
+                                  '<div class="formControls col-xs-8 col-sm-9"> ' +
+                                  '<select name="jibie" datatype="*"  class="input-text selectwith" onchange="gradeChange2(this.value)"> ' +
+                                  '<option value="">=选择级别分类=</option> ' + str+
+                                  '</select>' +
+                                  '</div> ' +
+                                  '<div class="col-4"> </div> ' +
+                                  '</div>';
+                              $("#sel").html(sem);
+                          }
+
+                      });
+                  }
+              function gradeChange2(type){
+                  $.post("/product/catlist",{cat_id:type},function(data){
+                      if(data.info.length > 0){
+                          var str = '';
+                          for(var i = 0; i< data.info.length; i++){
+                              str += '<option value="'+data.info[i]['cat_id']+'">'+data.info[i]['cat_name']+'</option> ';
+                          }
+                          var sem =
+                              '<div class="row cl"> ' +
+                              '<label class="form-label col-xs-2 col-sm-2"> ' +
+                              '<span class="c-red">*</span>分类：</label> ' +
+                              '<div class="formControls col-xs-8 col-sm-9"> ' +
+                              '<select name="cat_id" datatype="*"  class="input-text selectwith" > ' +
+                              '<option value="">=选择产品分类=</option> ' + str+
+                              '</select>' +
+                              '</div> ' +
+                              '<div class="col-4"> </div> ' +
+                              '</div>';
+                          $("#sel2").html(sem);
+                      }
+
+                  });
+              }
+
+              $(function(){
+                  //选择框
+                  $('.skin-minimal input').iCheck({
+                      checkboxClass: 'icheckbox-blue',
+                      radioClass: 'iradio-blue',
+                      increaseArea: '20%'
+                  });
+//内容框name设置
+                  var ue = UE.getEditor('editor',{'textarea':'content_admin'});
+
+                  $("#form-member-add").Validform({
+                      tiptype:1,
+                      ajaxPost:true,
+                      callback:function(data){
+                          setTimeout(function(){
+                              $.Hidemsg();
+                              if(data.status == 'y'){
+                                  var index = parent.layer.getFrameIndex(window.name);
+                                  parent.location.reload();
+                                  parent.layer.close(index);
+                              }
+                          },1000);
+                      }
+                  });
+              });
+              $('#img-upload').change(function(e){
+                  var input = $("#img-upload");
+                  var file = input[0].files[0];//获取input上传的文件
+                  if(!file.name){
+                      alert("未选择图片");
+                  }else{
+                      //高版本浏览器对文件上传路径进行了安全处理，无法直接通过获取input的value进行访问，故转化为获取图片的url进行安全访问
+                      var url = window.URL.createObjectURL(file);//将上传的文件转化为url
+                      $("#img-show").attr('src', url);//更新img的src属性
+                  };
+              });
+              </script>

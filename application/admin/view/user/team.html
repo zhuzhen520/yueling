@@ -1,0 +1,66 @@
+{include file="public/header"}
+<nav class="breadcrumb">
+    <i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户管理 <span class="c-gray en">&gt;</span> 团队列表
+    <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a>
+</nav>
+
+<div class="pd-20">
+    <form action="" method="get">
+        <div class="text-c">        
+            用户查询：
+              <input type="text" class="input-text" style="width:250px" placeholder="请输入用户id" name="mobile" value="{:input('mobile')}">
+            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+        </div>
+    </form>
+
+    <div class="cl pd-5 bg-1 bk-gray mt-20"> 
+        <span class="l">
+
+        </span>
+        <span class="r">共有数据：<strong id="count">{$list->total()}</strong> 条</span>
+    </div>
+
+    <div class="mt-20">
+        <form action="{:url('rule')}" method="post" id='sort-form'>
+            <table class="table table-border table-bordered table-bg table-hover table-sort">
+                <thead>
+                    <tr class="text-c">
+                        <th width="20">ID</th>
+                        <th width="20">用户id</th>
+                        <th width="50">个人报单业绩</th>
+                        <th width="50">直推人数</th>
+                        <th width="60">上级id</th>
+                        <th width="50">下级报单数量</th>
+                        <th width="10">等级</th>
+                        <th width="50">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name="list" item="v"}
+                        <tr class="text-c">
+                             <td>{$v.id}</td>
+                            <td>{$v.user_id}</td>
+                            <td>{$v.self_bd}</td>
+                            <td>{$v.zhitui_num}</td>
+                            <!--<td ><span style="float: left;">{$v.parent_str}</span></td>-->
+                            <td>
+                                <a class="btn btn-primary radius" data-title="查看" onclick="showother('{$v.parent_str}','上级ID')" href="javascript:;"><i class="Hui-iconfont">&#xe6dc;</i>查看</a>
+                            </td>
+                            <td>{$v.bd_num}</td>
+                            <td>{:leveltype($v.bd_level)}</td>
+                            <td>
+                                <a style="text-decoration:none" class="btn btn-success ml-5" onClick="new_open('添加/编辑','/user/teamadd?id={$v['id']}')" href="javascript:void(0);" title="编辑"><i class="Hui-iconfont">&#xe6df;</i></a>
+
+                            </td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+            <div class="page">
+                {:htmlspecialchars_decode($list->render())}
+            </div>
+        </form>
+    </div>
+</div>
+{include file="public/footer"}
+

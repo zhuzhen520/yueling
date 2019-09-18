@@ -1,0 +1,183 @@
+{include file="public:header" /}
+<title>会员层级关系</title>
+<body>
+<nav class="breadcrumb">
+	<i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 信息管理 <span class="c-gray en">&gt;</span> 会员信息 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+
+	<!--<form action="" method="get">-->
+		<!--<div class="text-c">-->
+			<!--<input type="text" name="member_id" value="{$Request.get.mobile}" id="" placeholder="输入用户手机号" style="width:250px" class="input-text">-->
+			<!--<button name="" class="btn btn-success" type="submit"><i class="Hui-iconfont">&#xe665;</i> 搜会员</button>-->
+		<!--</div>-->
+
+	<!--</form>-->
+	<div class="cl pd-5 bg-1 bk-gray mt-20">
+		<span class="l"></span>
+		<span class="r">团队人数：<strong id="count">{$count}</strong> 条</span>
+	</div>
+	<div class="zTreeDemoBackground left">
+		<ul id="treeDemo" class="ztree"></ul>
+	</div>
+</div>
+</body>
+{include file="public/footer"}
+<link rel="stylesheet" href="/static/admin/lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" type="text/css">
+<script type="text/javascript" src="/static/admin/lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+
+<script type="text/javascript">
+    <!--
+    var demoMsg = {
+        async:"正在进行异步加载，请等一会儿再点击...",
+        expandAllOver: "全部展开完毕",
+        asyncAllOver: "后台异步加载完毕",
+        asyncAll: "已经异步加载完毕，不再重新加载",
+        expandAll: "已经异步加载完毕，使用 expandAll 方法"
+    }
+    var setting = {
+        view: {
+            showIcon: showIconForTree
+        },
+        async: {
+            enable: true,
+            url:"{:url('treeData')}",
+            autoParam:["id", "name=n", "level=lv"],
+            //otherParam:{"otherParam":"test"},
+            dataFilter: filter,
+            type: "get"
+        },
+        callback: {
+            beforeAsync: beforeAsync,
+            onAsyncSuccess: onAsyncSuccess,
+            onAsyncError: onAsyncError
+        }
+    };
+
+    function filter(treeId, parentNode, childNodes) {
+        if (!childNodes) return null;
+        for (var i=0, l=childNodes.length; i<l; i++) {
+            childNodes[i].name = childNodes[i].name.replace(/\.n/g, '.');
+        }
+        return childNodes;
+    }
+
+    function beforeAsync() {
+        curAsyncCount++;
+    }
+
+    function onAsyncSuccess(event, treeId, treeNode, msg) {
+        curAsyncCount--;
+        if (curStatus == "expand") {
+            expandNodes(treeNode.children);
+        } else if (curStatus == "async") {
+            asyncNodes(treeNode.children);
+        }
+
+        if (curAsyncCount <= 0) {
+            if (curStatus != "init" && curStatus != "") {
+                $("#demoMsg").text((curStatus == "expand") ? demoMsg.expandAllOver : demoMsg.asyncAllOver);
+                asyncForAll = true;
+            }
+            curStatus = "";
+        }
+    }
+
+    function onAsyncError(event, treeId, treeNode, XMLHttpRequest, textStatus, errorThrown) {
+        curAsyncCount--;
+
+        if (curAsyncCount <= 0) {
+            curStatus = "";
+            if (treeNode!=null) asyncForAll = true;
+        }
+    }
+
+    var curStatus = "init", curAsyncCount = 0, asyncForAll = false,
+        goAsync = false;
+    function expandAll() {
+        if (!check()) {
+            return;
+        }
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        if (asyncForAll) {
+            $("#demoMsg").text(demoMsg.expandAll);
+            zTree.expandAll(true);
+        } else {
+            expandNodes(zTree.getNodes());
+            if (!goAsync) {
+                $("#demoMsg").text(demoMsg.expandAll);
+                curStatus = "";
+            }
+        }
+    }
+    function expandNodes(nodes) {
+        if (!nodes) return;
+        curStatus = "expand";
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        for (var i=0, l=nodes.length; i<l; i++) {
+            zTree.expandNode(nodes[i], true, false, false);
+            if (nodes[i].isParent && nodes[i].zAsync) {
+                expandNodes(nodes[i].children);
+            } else {
+                goAsync = true;
+            }
+        }
+    }
+
+    function asyncAll() {
+        if (!check()) {
+            return;
+        }
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        if (asyncForAll) {
+            $("#demoMsg").text(demoMsg.asyncAll);
+        } else {
+            asyncNodes(zTree.getNodes());
+            if (!goAsync) {
+                $("#demoMsg").text(demoMsg.asyncAll);
+                curStatus = "";
+            }
+        }
+    }
+    function asyncNodes(nodes) {
+        if (!nodes) return;
+        curStatus = "async";
+        var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+        for (var i=0, l=nodes.length; i<l; i++) {
+            if (nodes[i].isParent && nodes[i].zAsync) {
+                asyncNodes(nodes[i].children);
+            } else {
+                goAsync = true;
+                zTree.reAsyncChildNodes(nodes[i], "refresh", true);
+            }
+        }
+    }
+
+    function reset() {
+        if (!check()) {
+            return;
+        }
+        asyncForAll = false;
+        goAsync = false;
+        $("#demoMsg").text("");
+        $.fn.zTree.init($("#treeDemo"), setting);
+    }
+
+    function check() {
+        if (curAsyncCount > 0) {
+            $("#demoMsg").text(demoMsg.async);
+            return false;
+        }
+        return true;
+    }
+    function showIconForTree(treeId, treeNode) {
+        return !treeNode.isParent;
+    }
+
+    $(document).ready(function(){
+        $.fn.zTree.init($("#treeDemo"), setting);
+        $("#expandAllBtn").bind("click", expandAll);
+        $("#asyncAllBtn").bind("click", asyncAll);
+        $("#resetBtn").bind("click", reset);
+    });
+    //-->
+</script>

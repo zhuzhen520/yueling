@@ -1,0 +1,198 @@
+{include file="public/header" /}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 交易订单 <span class="c-gray en">&gt;</span> 发单列表 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+	<form action="" method="get">
+		<div class="text-c">
+			<span class="select-box inline">
+				<select id="types" name="type" class="select">
+					<option value="0">=订单类型=</option>
+					{foreach $info as $f}
+						<option value="{$f['type']}" {if condition=" input('get.type') eq $f['type']"}selected{/if} >{$f['name']}</option>
+					{/foreach}
+				</select>
+            </span>
+			日期范围：
+			<input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.start')}" name="start" id="datemin" class="input-text Wdate" style="width:120px;" readonly> -
+			<input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.end')}" name="end" id="datemin" class="input-text Wdate" style="width:120px;" readonly>
+			<input type="text" class="input-text" style="width:250px" placeholder="用户id|订单号" value="{:input('get.word')}" name="word">
+			<button type="submit" class="btn btn-success radius"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+		</div>
+	</form>
+
+	<div class="cl pd-5 bg-1 bk-gray mt-20">
+		<!--<span class="l"><a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a> <a href="javascript:;" onclick="product_add('添加产品','{:url('product_add')}')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加产品</a></span> -->
+	<span class="r">共有数据：<strong id="count">{$count}</strong> 条</span> </div>
+	<div class="mt-20">
+	<table class="table table-border table-bordered table-hover table-bg table-sort">
+		<thead>
+			<tr class="text-c">
+				<!--<th width="80">ID</th>-->
+				<th width="80">订单号</th>
+				<th width="50">用户id</th>
+				<th width="50">介绍</th>
+				<th width="50">语音</th>
+				<th width="100">图片介绍<br>[点击放大]</th>
+				<th width="50">服务类型 </th>
+				<th width="80">服务费用</th>
+				<th width="120">服务时间</th>
+				<th width="120">地点</th>
+				<th width="50">接单确认距离</th>
+				<th width="130">状态</th>
+				<th width="80">约定服务</th>
+				<th width="100">添加时间</th>
+				<th width="30">编辑</th>
+			</tr>
+		</thead>
+		<tbody>
+			{volist name="list" id="v"}
+				<tr class="text-c" id="tr{$v.id}">
+					<td>{$v.order_on}</td>
+					<td>{$v.user_id}</td>
+					<td>{$v.introduce}</td>
+					<td>
+						<!--<audio controls height="50" width="50">-->
+							<!--<source src="{$v.voice}" type="audio/ogg">-->
+							<!--<embed height="50" width="50" src="{$v.voice}">-->
+						<!--</audio>-->
+						<div onclick="play('{$v.voice}')">
+							<img src="/void/image_file.jpg" style="width: 25px;height: 25px;">
+						</div>
+					</td>
+					<td>
+						{foreach $v.img as $key=> $item}
+							<img src="{$item}" style="width: 25px;height: 25px;" onclick="showimg('{$item}')">
+						{/foreach}
+
+					</td>
+					<td>{$v.service_type}</td>
+					<td>
+						<span style="float: left;">诚意金:</span><span style="float: left;">{:floatval($v.earnestmoney)}</span><br>
+						<span style="float: left;">线下服务:</span><span style="float: left;">{:floatval($v.unline_service)}/{:unittype($v.unline_unit)}</span><br>
+						<span style="float: left;">电话服务:</span><span style="float: left;">{:floatval($v.phone_service)}/{:unittype($v.phone_unit)}</span><br>
+						<span style="float: left;">远程服务:</span><span style="float: left;">{:floatval($v.longrange_service)}/{:unittype($v.longrange_unit)}</span>
+					</td>
+
+					<td>{$v.start_time}
+					</td>
+					<td>{$v.address}</td>
+					<td>{$v.jwd}</td>
+					<td>
+						{if condition="$v.status == 6"}
+						状态：<span style="color: red">{:receipttype($v.status)}</span><br>
+						用户id：{$v.appeal}<br>
+						反馈：{$v.reason}
+
+						{else/}
+						{:receipttype($v.status)}
+						{/if}
+
+
+					</td>
+					<td>
+						{if condition="$v.s_type neq 0"}
+						<span style="float: left;">{$v.last_service_type}:</span><span style="float: left;">{:floatval($v.last_service_price)}/{:unittype($v.last_service_unit)}</span><br>
+						<span style="float: left;">服务次数:</span><span style="float: left;">{$v.service_time}</span><br>
+						<span style="float: left;">成交金额:</span><span style="float: left;">{:floatval($v.pay_money)}</span><br>
+						<span style="float: left;">接单用户:</span><span style="float: left;">{$v.accept_id}</span><br>
+						<span style="float: left;">接单状态:</span><span style="float: left;">{:receipttype($v.accept_status)}</span><br>
+							{if condition="floatval($v.accept_money) neq 0"}
+								<span style="float: left;">接单收益:</span><span style="float: left;">{:floatval($v.accept_money)}</span>
+							{/if}
+						{/if}
+					</td>
+					<td>{$v.add_time}</td>
+					<td>
+						{if condition="$v.status eq 6"}
+						<a class="btn btn-success radius" onclick="dealorder({$v.id})"> 待处理</a>
+						{/if}
+					</td>
+				</tr>
+			{/volist}
+		</tbody>
+	</table>
+	<div class="page text-r mt-10">
+		{$page}
+	</div>
+	</div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript" src="/mar/BenzAMRRecorder.js"></script>
+<script type="text/javascript">
+function play(voie){
+	var amr = new BenzAMRRecorder();
+	amr.initWithUrl(voie).then(function() {
+		amr.play();
+	});
+	amr.onEnded(function() {
+		layer.msg('播放完毕',{icon:1,time:3000});
+	})
+}
+
+/*产品-添加*/
+function member_add(title,url,w,h){
+    layer_show(title,url,w,h);
+}
+function product_add(title,url,w,h){
+	var index = layer.open({
+		type: 2,
+		title: title,
+		content: url
+	});
+	layer.full(index);
+}
+
+
+function dealorder(id){
+	layer.confirm('是否直接完成订单？',function(index){
+		$.post("{:url('dealorder')}",{id:id},function(data){
+			if(data.status == 'y'){
+				layer.msg(data.info,{icon:1,time:1000,shade: [0.3, '#000']},function(){
+					parent.location.reload();
+				});
+			}else{
+				layer.msg(data.info,{icon:2,time:1000});
+			}
+		},'json');
+	});
+}
+
+//批量删除
+function datadel(){
+ var id='';
+ $("input[name='del[]']:checked").each(function(){
+ 	id += $(this).val()+',';
+ });
+
+ if(id == ''){
+ 	layer.msg('还没选择!',{icon:2,time:1000});
+ 	return false;
+ }
+ layer.confirm('确认要删除吗？',function(index){
+ 	$.post("{:url('product_del')}",{id:id},function(data){
+		if(data.status == 'y'){
+			//循环当前选择的框
+			$("input[name='del[]']:checked").each(function(){
+				//删除当前选择的框
+				$(this).parents('tr').remove();
+			});
+			layer.msg(data.info,{icon:1,time:1000});
+			$("#count").text(data.count);
+		}else{
+			layer.msg(data.info,{icon:2,time:1000});
+		}
+	});
+ });
+}
+/*产品-相册*/
+function article_edit(title,url,id,w,h){
+	var index = layer.open({
+		type: 2,
+		title: title,
+		content: url
+	});
+	layer.full(index);
+}
+</script>
+</body>
+</html>

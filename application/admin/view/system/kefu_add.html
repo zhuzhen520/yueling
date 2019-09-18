@@ -1,0 +1,136 @@
+{include file="public/header" /}
+<style>
+    .withm{width: 50%}
+    .selectwith{width: 30%}
+    .upload-img{position:relative;}
+    .upload-img input{opacity: 0;border: 1px solid red;width: 177px;height: 164px;position: absolute;z-index: 1;}
+</style>
+<script type="text/javascript" src="/static/ueditor/1.4.3/ueditor.config.js"></script>
+<script type="text/javascript" src="/static/ueditor/1.4.3/ueditor.all.min.js"> </script>
+<script type="text/javascript" src="/static/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="form-add">
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>收款类型：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <select name="type" class="input-text selectwith" id="pid" onchange="gradeChange(this.value)" >
+                    <!--<option value="1"  >微信</option>-->
+                    <!--<option value="2" >支付宝</option>-->
+                    <!--<option value="3" >银行卡</option>-->
+                    <option value="4">微信客服</option>
+                    <option value="5">QQ客服</option>
+                    <!--<option value="6">微信公众号</option>-->
+                    <!--<option value="6">eth\btc钱包(前台显示最新一条)</option>-->
+                </select>
+            </div>
+            <div class="col-4"> </div>
+        </div>
+
+        <div id="onetwo">
+            <div class="row cl">
+                <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>账号：</label>
+                <div class="formControls col-xs-8 col-sm-9">
+                    <input type="text" class="input-text withm" value="" placeholder="支付宝/微信账号" name="title" datatype="*" nullmsg="请输入支付宝/微信账号">
+                </div>
+                <div class="col-4"> </div>
+            </div>
+        <!--<div class="row cl">-->
+            <!--<label class="form-label col-xs-2 col-sm-2">-->
+                <!--<span class="c-red">*</span>图片：</label>-->
+            <!--<div class="formControls col-xs-8 col-sm-9">-->
+                <!--<div class="upload-img">-->
+                    <!--<input id="img-upload" type="file" name="img"  accept="image/*">-->
+                    <!--<img id="img-show" src="/uploads/img/uploads.jpg" class="img-polaroid" width="170" height="170" alt="上传图片" title="上传图片">-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="col-4"> </div>-->
+        <!--</div>-->
+
+
+        </div>
+        <div id="threes">
+            <div class="row cl">
+                <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>收款人姓名：</label>
+                <div class="formControls col-xs-8 col-sm-9">
+                    <input type="text" class="input-text withm" value="" placeholder="银行卡收款姓名" name="name" datatype="*" nullmsg="请输入支付账号">
+                </div>
+                <div class="col-4"> </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>银行卡：</label>
+                <div class="formControls col-xs-8 col-sm-9">
+                    <input type="text" class="input-text withm" value="" placeholder="银行卡" name="yh" datatype="*" nullmsg="请输入银行卡">
+                </div>
+                <div class="col-4"> </div>
+            </div>
+            <div class="row cl">
+                <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>开户行：</label>
+                <div class="formControls col-xs-8 col-sm-9">
+                    <input type="text" class="input-text withm" value="" placeholder="开户行" name="kh" datatype="*" nullmsg="请输入开户行">
+                </div>
+                <div class="col-4"> </div>
+            </div>
+
+        </div>
+
+
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+            </div>
+        </div>
+    </form>
+</article>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+    $('#threes').hide();
+    function gradeChange(type){
+        if(type == 3){
+            $('#onetwo').hide();
+            $('#threes').show();
+        }else{
+            $('#onetwo').show();
+            $('#threes').hide();
+        }
+    }
+
+    $(function(){
+        //选择框
+        $('.skin-minimal input').iCheck({
+            checkboxClass: 'icheckbox-blue',
+            radioClass: 'iradio-blue',
+            increaseArea: '20%'
+        });
+//内容框name设置
+        var ue = UE.getEditor('editor',{'textarea':'content'});
+
+        $("#form-member-add").Validform({
+            tiptype:1,
+            ajaxPost:true,
+            callback:function(data){
+                setTimeout(function(){
+                    $.Hidemsg();
+                    if(data.status == 'y'){
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.location.reload();
+                        parent.layer.close(index);
+                    }
+                },1000);
+            }
+        });
+    });
+    $('#img-upload').change(function(e){
+        var input = $("#img-upload");
+        var file = input[0].files[0];//获取input上传的文件
+        if(!file.name){
+            alert("未选择图片");
+        }else{
+            //高版本浏览器对文件上传路径进行了安全处理，无法直接通过获取input的value进行访问，故转化为获取图片的url进行安全访问
+            var url = window.URL.createObjectURL(file);//将上传的文件转化为url
+            $("#img-show").attr('src', url);//更新img的src属性
+        };
+    });
+</script>

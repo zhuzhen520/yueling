@@ -1,0 +1,102 @@
+<script src="../../../../../../vue/h5/config/index.js"></script>{include file="public/header" /}
+<style>
+    .withm{width: 50%}
+    .selectwith{width: 30%}
+    .otherwith{width: 15%}
+    .upload-img{position:relative;}
+    .upload-img input{opacity: 0;border: 1px solid red;width: 177px;height: 164px;position: absolute;z-index: 1;}
+</style>
+<article class="page-container">
+    <form action="" method="post" class="form form-horizontal" id="form-add">
+
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>货币类型：</label>
+            <div class="formControls col-xs-8 col-sm-9 selectwith">
+                <select  class="input-text" name="sel1">
+                    <option value="1">余额</option>
+                    <option value="3">豆豆</option>
+                </select>
+             </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>充值类型：</label>
+            <div class="formControls col-xs-8 col-sm-9 selectwith">
+                <select  class="input-text" name="sel2">
+                    <option value="13">后台充值</option>
+                </select>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>+/-：</label>
+            <div class="formControls col-xs-8 col-sm-9 otherwith">
+                <select  class="input-text" name="sel3">
+                    <option value="1">增加</option>
+                    <option value="2">扣除</option>
+                </select>
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>数量：</label>
+            <div class="formControls col-xs-8 col-sm-9 selectwith">
+                 <input type="text" class="input-text" name="num" value="" placeholder="充值/扣除数量">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>登陆密码：</label>
+            <div class="formControls col-xs-8 col-sm-9 selectwith">
+                <input type="password" class="input-text" name="password" value="" placeholder="管理员登陆密码">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-2 col-sm-2">
+                *注：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                请不要连续点击，若网络慢，请等待提交..
+            </div>
+            <div class="col-4"> </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input type="hidden" value="{$id|default=''}" name="id">
+                <input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+            </div>
+        </div>
+    </form>
+</article>
+
+{include file="public/footer" /}
+<script type="text/javascript">
+$(function(){
+    $("#form-add").validate({
+        rules:{
+            username:{
+                required:true,
+                maxlength:16
+            },
+        },
+        onkeyup:false,
+        focusCleanup:true,
+        success:"valid",
+        submitHandler:function(form){
+            $(form).ajaxSubmit({
+                success:function(data){
+                    console.log(data);
+                    if(data.status == 'y'){
+                        layer.msg("操作成功",{icon:1,time:1000,shade: [0.3, '#000']},function(){
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.location.reload();
+                            parent.layer.close(index);
+                        });
+                    }else{
+                        layer.msg(data.info,{icon:2,time:1000,shade: [0.3, '#000']});
+                    }
+                },
+                error:function(error){
+                      layer.msg('系统发生了错误',{icon:2,time:3000,shade: [0.5, '#FF0000']});
+                }
+            });
+
+        }
+    });
+});
+</script> 

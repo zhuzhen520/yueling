@@ -1,0 +1,117 @@
+{include file="public/header" /}
+
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 交易中心 <span class="c-gray en">&gt;</span> 交易列表 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+    <form action="" method="get">
+        <div class="text-c">
+            <span class="select-box inline">
+            <select name="status" class="select">
+                <option value="">=状态=</option>
+                <option value="2" {:input('status') == 2 ? 'selected':''} >已拒绝</option>
+                <option value="1" {:input('status') == 1 ? 'selected':''} >已转出</option>
+                <option value="3" {:input('status') == 3 ? 'selected':''} >未审核</option>
+            </select>
+            </span>
+            <span class="select-box inline">
+                <select name="type" class="select">
+                    <option value="">=提币类型=</option>
+                    {foreach :config('base.coins') as $k=>$v }
+                        <option value="{$k}" {:input('type') == $k ? 'selected':''}>{$v}</option>
+                    {/foreach}
+                </select>
+            </span>
+            &nbsp;日期范围：
+            <input type="text" onfocus="WdatePicker()" readonly name="start" value="{:input('get.start')}" class="input-text Wdate" style="width:120px;">
+            -
+            <input type="text" onfocus="WdatePicker()" readonly name="end" value="{:input('get.start')}" class="input-text Wdate" style="width:120px;">
+            <input type="text" class="input-text" style="width:250px" placeholder="用户ID|提现地址|手机号码"
+                   value="{:input('word')}" name="word">
+            <button type="submit" class="btn btn-success radius"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+        </div>
+    </form>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+            今日提现CGS总量：{$today} &nbsp;&nbsp;&nbsp;&nbsp;提现CGS总量：{$sum}
+        </span>
+        <span class="r">共有数据：<strong id="count">{$list->count()}</strong> 条</span> </div>
+    <div class="mt-20">
+
+        <table class="table table-border table-bordered table-hover table-bg table-sort">
+            <thead>
+            <tr class="text-c">
+                <th width="50">ID</th>
+                <th width="100">用户ID/手机号码</th>
+                <th width="50">提币类型</th>
+                <th width="100">提币数量</th>
+                <th width="100">手续费数量</th>
+                <th width="100">手续费比例</th>
+                <th>提币地址</th>
+                <th width="100">申请时间</th>
+                <th width="100">状态</th>
+                <th width="100">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {volist name="list" id="v"}
+            <tr class="text-c" id="tr{$v.id}">
+                <td>{$v.id}</td>
+                <td>{$v.user_id}<br>{$v.mobile}</td>
+                <td>{$v->type_text}</td>
+                <td>{$v.num}</td>
+                <td>{$v.poundage}</td>
+                <td>{$v.rate}</td>
+                <td>{$v.address}</td>
+                <td>{$v.created}</td>
+                <td>
+                    {switch name="$v.status"}
+                    {case value="0"} <span class="label label-default radius">未审核</span> {/case}
+                    {case value="1"} <span class="label label-default radius">已转出</span> {/case}
+                    {case value="2"} <span class="label label-primary radius">已拒绝</span> {/case}
+                    {/switch}
+                </td>
+                <td class="td-manage">
+                    {switch name="$v.status"}
+                    {case value="0"}
+                    <a title="通过" href="javascript:;"
+                       onclick="member_sta(this,{$v['id']},1)" class="ml-5" style="text-decoration:none">
+                        <i class="Hui-iconfont">&#xe615;</i>
+                    </a>
+                    <a title="驳回" href="javascript:;"
+                       onclick="member_sta(this,{$v['id']},2)" class="ml-5" style="text-decoration:none">
+                        <i class="Hui-iconfont">&#xe60b;</i>
+                    </a>
+                    {/case}
+                    {/switch}
+                </td>
+            </tr>
+            {/volist}
+            </tbody>
+        </table>
+
+        <div class="page">
+            {:htmlspecialchars_decode($list->render())}
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function member_sta(obj,id,status){
+        layer.confirm('确认要修改吗？',function(index){
+            $.post("{:url('withdraw_sta')}",{id:id,status:status},function(data){
+                if(data.status == 0){
+                    layer.msg(data.info,{icon:1,time:1000});
+                    window.location.reload();
+                }else{
+                    layer.msg(data.info,{icon:2,time:1000});
+                }
+            },'json');
+        });
+    }
+
+    function show_address(info){
+        layer.msg(info,{icon:2,time:1000});
+    }
+
+</script>
+{include file="public/footer"}

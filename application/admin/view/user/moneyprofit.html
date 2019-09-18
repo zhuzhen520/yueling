@@ -1,0 +1,88 @@
+{include file="public/header"}
+<nav class="breadcrumb">
+    <i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户管理 <span class="c-gray en">&gt;</span> 团队收益
+    <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a>
+</nav>
+
+<div class="pd-20">
+    <form action="" method="get">
+        <div class="text-c">
+            查询：
+            <span class="select-box inline">
+                <select id="types" name="currency" class="select">
+                    <option value="0">=货币类型=</option>
+                    {foreach $currency_type as $c}
+                    <option value="{$c.currency}" {if condition="$c.currency eq input('get.currency')"}selected{/if} >{:currencytype($c.currency)}</option>
+                    {/foreach}
+                </select>
+            </span>
+            <span class="select-box inline">
+                <select id="types" name="action_type" class="select">
+                    <option value="0">=收益类型=</option>
+                    {foreach $action_type as $b}
+                    <option value="{$b.action_type}" {if condition="$b.action_type eq input('get.action_type')"}selected{/if} >{:actiontype($b.action_type)}</option>
+                    {/foreach}
+                </select>
+            </span>
+
+            <input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.start')}" name="start" id="datemin" class="input-text Wdate" style="width:120px;" readonly> -
+            <input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.end')}" name="end" id="datemin" class="input-text Wdate" style="width:120px;" readonly>
+            <input type="text" class="input-text" style="width:250px" placeholder="请输入用户id|用户账号" name="word" value="{:input('word')}">
+            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+        </div>
+    </form>
+
+    <div class="cl pd-5 bg-1 bk-gray mt-20"> 
+        <span class="l">
+
+        </span>
+        <span class="r">共有数据：<strong id="count">{$list->total()}</strong> 条</span>
+    </div>
+
+    <div class="mt-20">
+        <form action="{:url('rule')}" method="post" id='sort-form'>
+            <table class="table table-border table-bordered table-bg table-hover table-sort">
+                <thead>
+                    <tr class="text-c">
+                        <th width="20">ID</th>
+                        <th width="20">用户id</th>
+                        <th width="20">账号</th>
+                        <th width="60">变动金额</th>
+                        <th width="60">用户余额</th>
+                        <th width="20">货币类型</th>
+                        <th width="30">收益类型</th>
+                        <th width="20">类型</th>
+                        <th width="50">时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name="list" item="v"}
+                        <tr class="text-c">
+                             <td>{$v.id}</td>
+                            <td>{$v.uid}</td>
+                            <td>{$v.username}</td>
+
+                            <td>{:floatval($v.action)}</td>
+                            <td>{:floatval($v.money_end)}</td>
+                            <td>{:currencytype($v.currency)}</td>
+                            <td>{:actiontype($v.action_type)}</td>
+                            <td>
+                                {switch name="$v.type"}
+                                {case value="0"} <span class="label label-default radius">转出</span> {/case}
+                                {case value="1"} <span class="label label-primary radius">转入</span> {/case}
+                                 {/switch}
+                            </td>
+                            <td>{$v.add_time}</td>
+
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+            <div class="page">
+                {:htmlspecialchars_decode($list->render())}
+            </div>
+        </form>
+    </div>
+</div>
+{include file="public/footer"}
+

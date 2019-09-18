@@ -1,0 +1,100 @@
+{include file="public/header" /}
+<link href="/static/Admin/lib/lightbox2/2.8.1/css/lightbox.css" rel="stylesheet" type="text/css" >
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 系统管理 <span class="c-gray en">&gt;</span> 推荐背景 <span class="c-gray en">&gt;</span> 图片展示 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+	<div class="cl pd-5 bg-1 bk-gray mt-20"> 
+		<span class="l">
+			<!-- <a href="javascript:;" onclick="member_add('添加首页图片','{:url('banner_add',array('type'=>'index'))}')" class="btn btn-primary radius">
+			<i class="Hui-iconfont">&#xe625;</i> 添加图轮播片</a> -->
+			<a href="javascript:;" onclick="new_open('添加推荐背景','/system/recommend_add?type=recommend')" class="btn btn-success radius">
+			<i class="Hui-iconfont">&#xe672;</i> 添加推荐背景</a>
+
+			<a href="javascript:;" onclick="datadel()" class="btn btn-danger radius">
+			<i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a> 
+		</span> 
+		<span class="r">共有图片：<strong id="count">{:count($list)}</strong> 张</span> </div>
+	<div class="portfolio-content">
+		<ul class="cl portfolio-area">
+			{volist name="list" id="v"}
+				<li class="item"  style="width: 250px;height: 444.7px; margin-bottom: 40px">
+					<div class="portfoliobox" style="width: 250px;">
+						<a style="text-decoration:none;" class="ml-5"   onClick="member_del(this,{$v.id})" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>
+						<span class="label label-success radius">推荐背景图</span>
+						<input class="checkbox" name="del[]" type="checkbox" value="{$v.id}">
+						<img src="{$v.image_path}" style="width: 250px;height: 444.7px;" onclick="showimg('{$v.image_path}')">
+					</div>
+				</li>
+			{/volist}
+		</ul>
+	</div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript" src="/static/Admin/lib/lightbox2/2.8.1/js/lightbox-plus-jquery.min.js"></script> 
+<script type="text/javascript">
+$(function(){
+	$.Huihover(".portfolio-area li");
+});
+/*添加-相册*/
+function member_add(title,url,id,w,h){
+	layer_show(title,url,w,h);
+}
+function showimg(imgs){
+	layer.open({
+		type: 1,
+		title: false,
+		area: ['375px', '667px'],
+		shadeClose: true,
+		skin: 'layui-layer-nobg', //没有背景色
+		content: "<img src='"+imgs+"' style='width: 375px;height: 667px;;'>"
+	});
+}
+
+/*-删除*/
+function member_del(obj,id){
+	layer.confirm('确认要删除吗？',function(index){
+		$.post("{:url('banner_del')}",{id:id},function(data){
+			if(data.status == 'y'){
+				layer.msg(data.info,{icon:1,time:1000});
+				$(obj).parents("li").remove();
+				$("#count").text(data.count);
+			}else{
+				layer.msg('删除失败',{icon:2,time:1000});
+			}
+		},'json');
+	});
+}
+/* 批量删除 */
+function datadel(){
+ var id='';	
+ $("input[name='del[]']:checked").each(function(){
+ 	id += $(this).val()+',';
+ });
+
+ if(id == ''){
+ 	layer.msg('必须选择一个哦!',{icon:2,time:1000});
+ 	return false;
+ }
+ layer.confirm('确认要删除吗？',function(index){
+ 	$.post("{:url('banner_del')}",{id:id},function(data){
+			if(data.status == 'y'){
+				$("input[name='del[]']:checked").each(function(){
+					//删除选中的
+ 					$(this).parents('li').remove();
+ 					//children的长度
+					// for(var i=0;i<data.children.length;i++){
+					// 	$("#tr"+data.children[i]).remove();
+					// }
+ 				});
+ 				//数量赋值
+				$("#count").text(data.count);
+				layer.msg(data.info,{icon:1,time:1000});
+			}else{
+				layer.msg(data.info,{icon:2,time:1000});
+			}
+	});
+ });
+}
+</script>
+</body>
+</html>

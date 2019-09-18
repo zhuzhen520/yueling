@@ -1,0 +1,291 @@
+{include file="public/header" /}
+<style>
+	.withm{width: 50%}
+	.selectwith{width: 30%}
+	.otherwith{width: 15%}
+	.upload-img{position:relative;}
+	.upload-img input{opacity: 0;border: 1px solid red;width: 177px;height: 164px;position: absolute;z-index: 1;}
+</style>
+<script type="text/javascript" src="/static/ueditor/1.4.3/ueditor.config.js"></script>
+<script type="text/javascript" src="/static/ueditor/1.4.3/ueditor.all.min.js"> </script>
+<script type="text/javascript" src="/static/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+<article class="page-container">
+	<form action="" method="post" class="form form-horizontal" id="form-add">
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2">
+				<span class="c-red">*</span>产品图片：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<div class="upload-img">
+					<input id="img-upload" type="file" name="img"  accept="image/*">
+					<img id="img-show" src="{$img}" class="img-polaroid" width="200" height="130" alt="上传图片" title="上传图片">
+					图片大小：750*487
+				</div>
+			</div>
+			<div class="col-4"></div>
+		</div>
+		<br>
+		<br>
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>车辆名称：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text withm" value="{$name}"   placeholder="" id="name" name="name"  datatype="*" nullmsg="请填写产品名称">
+			</div>
+			<div class="col-4"> </div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>车辆短介：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text withm" value="{$sort_name}"   placeholder="" id="sort_name" name="sort_name"  datatype="*" nullmsg="请填写车辆短介">
+			</div>
+			<div class="col-4"> </div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>价格区间：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text otherwith" value="{$min_price}"   placeholder="" id="min_price" name="min_price"  datatype="*" nullmsg="最小价格"> -
+				<input type="text" class="input-text otherwith" value="{$max_price}"   placeholder="" id="max_price" name="max_price"  datatype="*" nullmsg="最大价格">
+				万
+			</div>
+			<div class="col-4"> </div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>品牌：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<select class="input-text selectwith" name="brand">
+					<option value="0">请选择</option>
+					{volist name="car" id="c"}
+					<option value="{$c.id}" {if condition="$c.id eq $brand"}selected = selected{/if}>{$c.bfirstletter}-{$c.name}</option>
+					{/volist}
+				</select>
+			</div>
+			<div class="col-4"> </div>
+		</div>
+
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>变速箱：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<select class="input-text selectwith" name="speed">
+					<option value="0">手动</option>
+					<option value="1">自动</option>
+				</select>
+			</div>
+			<div class="col-4"> </div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>排量区间：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text otherwith" value="{$pailiang}"   placeholder="" id="pailiang" name="pailiang"  datatype="*" nullmsg="最小排量">-
+				<input type="text" class="input-text otherwith" value="{$max_pailiang}"   placeholder="" id="max_pailiang" name="max_pailiang"  datatype="*" nullmsg="最大排量">
+ 			</div>
+			<div class="col-4"> </div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>车辆类型：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<select class="input-text selectwith" name="car_type">
+					<option value="1" {if condition="$car_type eq 1"}selected = selected{/if}>SUV</option>
+					<option value="2" {if condition="$car_type eq 2"}selected = selected{/if}>MVP</option>
+					<option value="3" {if condition="$car_type eq 3"}selected = selected{/if}>两厢轿车</option>
+					<option value="4" {if condition="$car_type eq 4"}selected = selected{/if}>轿车</option>
+					<option value="5" {if condition="$car_type eq 5"}selected = selected{/if}>跑车</option>
+					<option value="6" {if condition="$car_type eq 6"}selected = selected{/if}>皮卡</option>
+					<option value="7" {if condition="$car_type eq 7"}selected = selected{/if}>微面</option>
+					<option value="8" {if condition="$car_type eq 8"}selected = selected{/if}>微卡</option>
+					<option value="9" {if condition="$car_type eq 9"}selected = selected{/if}>轻客</option>
+					<option value="10" {if condition="$car_type eq 10"}selected = selected{/if}>其他</option>
+				</select>
+				<!--<input type="text" class="input-text selectwith" value="{$car_type}"   placeholder="" id="car_type" name="car_type"  datatype="*" nullmsg="车辆类型">-->
+ 			</div>
+			<div class="col-4"> </div>
+		</div>
+
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>车身：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				长：<input type="text" class="input-text selectwith" value="{$car_length}"   placeholder="" id="car_length" name="car_length"  datatype="*" nullmsg="车辆类型">
+				<br>
+				<br>
+				宽：<input type="text" class="input-text selectwith" value="{$car_width}"   placeholder="" id="car_width" name="car_width"  datatype="*" nullmsg="车辆类型">
+				<br>
+				<br>
+				高：<input type="text" class="input-text selectwith" value="{$car_height}"   placeholder="" id="car_height" name="car_height"  datatype="*" nullmsg="车辆类型">
+			</div>
+			<div class="col-4"> </div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>km/h加速：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text selectwith" value="{$accelerator}"   placeholder="" id="accelerator" name="accelerator"  datatype="*" nullmsg="车辆类型">
+			</div>
+			<div class="col-4"> </div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>动力：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text selectwith" value="{$power}"   placeholder="" id="power" name="power"  datatype="*" nullmsg="车辆类型">
+			</div>
+			<div class="col-4"> </div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>首付描述：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<select class="input-text selectwith" name="fq_type">
+					<option value="0">请选择</option>
+					{volist name="cat_row" id="w"}
+					<option value="{$w.cat_id}" {if condition="$w.cat_id eq $fq_type"}selected = selected{/if}>{$w.cat_name}</option>
+					{/volist}
+				</select>
+				<!--<input type="text" class="input-text withm" value="{$fq_type}"   placeholder="" id="fq_type" name="fq_type"  datatype="*" nullmsg="分期x成购/月供">-->
+			</div>
+			<div class="col-4"> </div>
+		</div>
+		<!--<div class="row cl">-->
+			<!--<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>首付：</label>-->
+			<!--<div class="formControls col-xs-8 col-sm-9">-->
+				<!--<input type="text" class="input-text withm" value="{$sf_price}"   placeholder="" id="sf_price" name="sf_price"  datatype="*" nullmsg="分期x成购/月供">-->
+			<!--</div>-->
+			<!--<div class="col-4"> </div>-->
+		<!--</div>-->
+		<!--<div class="row cl">-->
+			<!--<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>月供：</label>-->
+			<!--<div class="formControls col-xs-8 col-sm-9">-->
+				<!--<input type="text" class="input-text withm" value="{$fq_price}"   placeholder="" id="fq_price" name="fq_price"  datatype="*" nullmsg="分期x成购/月供">-->
+			<!--</div>-->
+			<!--<div class="col-4"> </div>-->
+		<!--</div>-->
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>是否热门：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<select class="input-text selectwith" name="is_hot">
+					<option value="0" {if condition="$is_hot eq 0"}selected = selected{/if}>否</option>
+					<option value="1" {if condition="$is_hot eq 1"}selected = selected{/if}>是</option>
+				</select>
+ 			</div>
+			<div class="col-4"> </div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>分期推荐：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<select class="input-text selectwith" name="fenqi">
+					<option value="0" {if condition="$fenqi eq 0"}selected = selected{/if}>否</option>
+					<option value="1" {if condition="$fenqi eq 1"}selected = selected{/if}>是</option>
+				</select>
+			</div>
+			<div class="col-4"> </div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2"><span class="c-red">*</span>加盟商：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<select class="input-text withm" name="dl_id">
+					<option value="0">无</option>
+					{volist name="dlid" id="d"}
+					<option value="{$d.user_id}" {if condition="$d.user_id eq $dl_id"}selected = selected{/if}>{$d.mobile}【{$d.name}】</option>
+					{/volist}
+				</select>
+			</div>
+			<div class="col-4"> </div>
+		</div>
+		<div class="row cl">
+			<label class="form-label col-xs-2 col-sm-2">
+				<span class="c-red">*</span>其他：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<script id="editor" type="text/plain" style="width:100%;height:400px;">{:htmlspecialchars_decode($content)}</script>
+			</div>
+			<div class="col-4"> </div>
+		</div>
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+				<input type="hidden" value="{$id}" name="id">
+				<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+			</div>
+		</div>
+	</form>
+</article>
+
+{include file="public/footer" /}
+
+<script type="text/javascript">
+	function gradeChange(type){
+		$.post("/product/catlist",{cat_id:type},function(data){
+			if(data.info.length > 0){
+				var str = '';
+				for(var i = 0; i< data.info.length; i++){
+					str += '<option value="'+data.info[i]['cat_id']+'">'+data.info[i]['cat_name']+'</option> ';
+				}
+				var sem =
+						'<div class="row cl"> ' +
+						'<label class="form-label col-xs-2 col-sm-2"> ' +
+						'<span class="c-red">*</span>级别：</label> ' +
+						'<div class="formControls col-xs-8 col-sm-9"> ' +
+						'<select name="jibie" datatype="*"  class="input-text selectwith" onchange="gradeChange2(this.value)"> ' +
+						'<option value="">=选择级别分类=</option> ' + str+
+						'</select>' +
+						'</div> ' +
+						'<div class="col-4"> </div> ' +
+						'</div>';
+				$("#sel").html(sem);
+			}
+
+		});
+	}
+	function gradeChange2(type){
+		$.post("/product/catlist",{cat_id:type},function(data){
+			if(data.info.length > 0){
+				var str = '';
+				for(var i = 0; i< data.info.length; i++){
+					str += '<option value="'+data.info[i]['cat_id']+'">'+data.info[i]['cat_name']+'</option> ';
+				}
+				var sem =
+						'<div class="row cl"> ' +
+						'<label class="form-label col-xs-2 col-sm-2"> ' +
+						'<span class="c-red">*</span>分类：</label> ' +
+						'<div class="formControls col-xs-8 col-sm-9"> ' +
+						'<select name="cat_id" datatype="*"  class="input-text selectwith" > ' +
+						'<option value="">=选择产品分类=</option> ' + str+
+						'</select>' +
+						'</div> ' +
+						'<div class="col-4"> </div> ' +
+						'</div>';
+				$("#sel2").html(sem);
+			}
+
+		});
+	}
+
+	$(function(){
+		//选择框
+		$('.skin-minimal input').iCheck({
+			checkboxClass: 'icheckbox-blue',
+			radioClass: 'iradio-blue',
+			increaseArea: '20%'
+		});
+//内容框name设置
+		var ue = UE.getEditor('editor',{'textarea':'content'});
+
+		$("#form-member-add").Validform({
+			tiptype:1,
+			ajaxPost:true,
+			callback:function(data){
+				setTimeout(function(){
+					$.Hidemsg();
+					if(data.status == 'y'){
+						var index = parent.layer.getFrameIndex(window.name);
+						parent.location.reload();
+						parent.layer.close(index);
+					}
+				},1000);
+			}
+		});
+	});
+		$('#img-upload').change(function(e){
+			var input = $("#img-upload");
+			var file = input[0].files[0];//获取input上传的文件
+			if(!file.name){
+				alert("未选择图片");
+			}else{
+				//高版本浏览器对文件上传路径进行了安全处理，无法直接通过获取input的value进行访问，故转化为获取图片的url进行安全访问
+				var url = window.URL.createObjectURL(file);//将上传的文件转化为url
+				$("#img-show").attr('src', url);//更新img的src属性
+			};
+		});
+</script>

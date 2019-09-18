@@ -1,0 +1,68 @@
+{include file="public/header"}
+<nav class="breadcrumb">
+    <i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 车辆管理 <span class="c-gray en">&gt;</span> 车辆品牌
+    <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a>
+</nav>
+<meta name="referrer" content="no-referrer">
+<div class="pd-20">
+
+    <div class="cl pd-5 bg-1 bk-gray mt-20"> 
+       <span class="l">
+			<a href="javascript:;" onclick="updates()" class="btn btn-danger radius">更新</a>
+       </span>
+        <span class="r">共有数据：<strong id="count">{$list->total()}</strong> 条</span>
+    </div>
+
+    <div class="mt-20">
+        <form action="{:url('rule')}" method="post" id='sort-form'>
+            <table class="table table-border table-bordered table-bg table-hover table-sort">
+                <thead>
+                    <tr class="text-c">
+                        <th width="100">ID</th>
+                        <th width="100">logo</th>
+                        <th width="100">首字母</th>
+                        <th width="100">品牌名称</th>
+
+
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name="list" item="v"}
+                        <tr class="text-c">
+                            <td>{$v.id}</td>
+                            <td style="padding: 0"><img src="{$v.logo}" style="width: 40px;height: 40px;" onclick="showimg('{$v.logo}')"></td>
+                            <td>{$v.bfirstletter}</td>
+                            <td>{$v.name}</td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+            <div class="page">
+                {:htmlspecialchars_decode($list->render())}
+            </div>
+        </form>
+    </div>
+</div>
+{include file="public/footer"}
+
+<script>
+    var count = 0;
+    /*产品-删除*/
+    function updates(obj,id){
+        layer.confirm('确认更新车辆品牌？',function(index){
+            count += 1;
+            if(count >= 1){
+                layer.msg('更新中, 请稍后...',{icon:1,time:3000});
+            }
+            $.post("/product/car",{id:id},function(data){
+                 console.log(data['result']['branditems']);
+                    $.post("/product/brondinsert", {info:data['result']['branditems']},function(res){
+                        layer.msg(res.info,{icon:1,time:3000});
+                        window.location.reload();
+                    },'json');
+            },'json');
+        });
+    }
+
+
+</script>

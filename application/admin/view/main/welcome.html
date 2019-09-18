@@ -1,0 +1,180 @@
+{include file="public/header" /}
+<div class="pd-20" style="padding-top:20px;">
+    <p class="f-20 text-success">欢迎使用后台管理系统！</p>
+    <p>登录次数：{$admin.login_num} </p>
+    <p>上次登录IP：{$admin.login_ip} 最近登录时间：{$admin.updated|date='Y-m-d H:i:s'}</p>
+    <!--<div class="page-container">-->
+    <!--<div id="doubleline" style="min-width:700px;height:300px"></div>-->
+    <!--</div>-->
+    <!--<br>-->
+    <div style="width: 100%; height: 310px; background-color: #dddddd; padding: 0">
+        <!--折线图-->
+        <div class="page-container" style="width: 49%;height: 300px;float: left; padding: 0;">
+            <div id="container" style="min-width:550px;height:300px"></div>
+        </div>
+        <!--时间轴拆线图-->
+        <div class="page-container" style="width: 49%;height: 300px;float: right; padding: 0;">
+            <!--<div id="timeonline" style="min-width:550px;height:300px"></div>-->
+            <div id="doubleline" style="min-width:550px;height:300px"></div>
+        </div>
+    </div>
+
+    <table class="table table-border table-bordered table-bg">
+        <thead>
+        <tr>
+            <th colspan="6" scope="col">信息统计</th>
+        </tr>
+        <tr class="text-c">
+            <th>统计</th>
+            <th>余额</th>
+            <th>豆豆</th>
+            <th>提现手续费</th>
+            <th>积分商城成交量</th>
+            <th>会员数量</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="text-c">
+            <td>总数</td>
+            <td>{$row['money']}</td>
+            <td>{$row['td_money']}</td>
+            <td>{$row['tx_money']}</td>
+            <td>{$row['shop_num']}</td>
+            <td>{$row['user']}</td>
+         </tr>
+        </tbody>
+    </table>
+
+    <br>
+
+
+</div>
+
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" src="/static/huiadmin/lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="/static/huiadmin/lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="/static/huiadmin/static/h-ui/js/H-ui.min.js"></script>
+<script type="text/javascript" src="/static/huiadmin/static/h-ui.admin/js/H-ui.admin.js"></script> <!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/static/huiadmin/lib/hcharts/Highcharts/5.0.6/js/highcharts.js"></script>
+<script type="text/javascript" src="/static/huiadmin/lib/hcharts/Highcharts/5.0.6/js/modules/exporting.js"></script>
+<script type="text/javascript">
+    //折线图
+    $(function () {
+        $.ajax({
+            url:"{:url('infoData')}",
+            type:'POST',
+            dataType:'json',
+            data:{},
+            success:function(data){
+                Highcharts.chart('container', {
+                    title: {
+                        text: data.info.line_name,
+                        x: -20 //center
+                    },
+                    xAxis: {
+                        categories: data.info.x_axis
+                    },
+                    yAxis: {
+                        title: {
+                            text: data.info.y_name
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                    },
+                    tooltip: {
+                        valueSuffix: ''
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    //线条
+                    series: [{
+                        name: data.info.info1.name,
+                        data: data.info.info1.num
+                    },{
+                        name: data.info.info2.name,
+                        data: data.info.info2.num
+                    },
+                    // {
+                    //     name: data.info.info3.name,
+                    //     data: data.info.info3.num
+                    // },{
+                    //     name: data.info.info4.name,
+                    //     data: data.info.info4.num
+                    // }
+                    ]
+                });
+            }
+        });
+        //时间轴拆线图
+        $.ajax({
+            url:"{:url('statisticInfo')}",
+            type:'POST',
+            dataType:'json',
+            data:{},
+            success:function(data){
+                $('#doubleline').highcharts({
+                    chart: {
+                        type: 'area'
+                    },
+                    title: {
+                        text:  data.info.line_name,
+                    },
+                    xAxis: {
+                        categories:  data.info.x_axis
+                    },
+
+                    yAxis: {
+                        title: {
+                            text:data.info.y_name
+                        },
+                        labels: {
+                            formatter: function() {
+                                return this.value;
+                            }
+                        }
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.y:,.0f}</b>'
+                    },
+                    plotOptions: {
+                        area: {
+                            marker: {
+                                enabled: false,
+                                symbol: 'circle',
+                                radius: 2,
+                                states: {
+                                    hover: {
+                                        enabled: true
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    //线条
+                    series: [
+                        {
+                            name: data.info.info1.name,
+                            data: data.info.info1.num
+                        },
+                        {
+                            name: data.info.info2.name,
+                            data: data.info.info2.num
+                        }
+                    ]
+                });
+            }
+        });
+
+
+
+    });
+</script>

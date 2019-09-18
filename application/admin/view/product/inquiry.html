@@ -1,0 +1,143 @@
+{include file="public/header" /}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户管理 <span class="c-gray en">&gt;</span> 推荐客源 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+	<form action="" method="get">
+		<div class="text-c">
+			日期范围：
+			<input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.start')}" name="start" id="datemin" class="input-text Wdate" style="width:120px;" readonly> -
+			<input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.end')}" name="end" id="datemin" class="input-text Wdate" style="width:120px;" readonly>
+			<input type="text" class="input-text" style="width:250px" placeholder="姓名|推荐id" value="{:input('get.word')}" name="word">
+			<button type="submit" class="btn btn-success radius"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+		</div>
+	</form>
+
+	<div class="cl pd-5 bg-1 bk-gray mt-20">
+		<span class="r" style="float: right;">共有数据：<strong id="count">{$count}</strong> 条</span>
+	</div>
+	<div class="mt-20">
+		<table class="table table-border table-bordered table-hover table-bg table-sort">
+			<thead>
+			<tr class="text-c">
+				<th width="25"><input type="checkbox" name="" value=""></th>
+				<th width="40">ID</th>
+				<th width="50">推荐人id</th>
+				<th width="80">姓名</th>
+				<th width="60">手机号</th>
+				<th width="100">车辆图片/名称</th>
+				<th width="100">品牌名称</th>
+				<th width="150">添加时间</th>
+				<th width="60">查看状态</th>
+			</tr>
+			</thead>
+			<tbody>
+			{volist name="list" id="v"}
+			<tr class="text-c" id="tr{$v.id}">
+				<td><input type="checkbox" value="{$v.id}" name="del[]"></td>
+				<td>{$v.id}</td>
+				<td>{$v.userid}</td>
+				<td> {$v.name}</td>
+				<td> {$v.phone}</td>
+				<td> <img src="{$v.cimg}" style="width: 40px;height: 40px;" onclick="showimg('{$v.cimg}')"><br>{$v.cname}</td>
+				<td> <img src="{$v.logo}" style="width: 40px;height: 40px;" onclick="showimg('{$v.logo}')"><br>{$v.carname}</td>
+
+
+				<td>{$v.add_time}</td>
+
+				<td class="td-manage">
+					<img src="/static/Admin/images/icon_{$v['sh']==1?'right':'error'}_s.png" style="cursor:pointer;" onclick="toggle_status(this,{$v.id},{$v.sh},'vehicle_inquiry','sh')">
+				</td>
+			</tr>
+			{/volist}
+			</tbody>
+		</table>
+		<div class="page">
+			{:htmlspecialchars_decode($list->render())}
+		</div>
+	</div>
+</div>
+{include file="public/footer"}
+<script>
+	function tog_status(obj,id,status,table,field){
+		var news_status = status == 1 ? 0 : 1;
+		if(typeof(field) == 'undefined'){
+			field = 'is_show';
+		}
+		$.post("<?php echo url('Base/toggle_status'); ?>",{id:id,status:news_status,table,field:field},function(data){
+			if(data == 1){
+				layer.msg('操作成功!',{icon:6,time:1000});
+				if(news_status == 0){
+					src="/static/Admin/static/h-ui/images/validform/iconpic-error.png";
+				}else{
+					src="/static/Admin/static/h-ui/images/validform/iconpic-right.png";
+				}
+				$(obj).attr('src',src).attr('onclick',"toggle_status(this,"+id+","+news_status+",'"+table+"','"+field+"')");
+			}else{
+				layer.msg('操作失败了!',{icon:5,time:1000});
+			}
+		});
+	}
+
+	/*显示隐藏切换*/
+	function toggle_status(obj,id,status,table,field){
+		var news_status = status == 1 ? 0 : 1;
+		if(typeof(field) == 'undefined'){
+			field = 'is_show';
+		}
+		$.post("<?php echo url('Base/toggle_status'); ?>",{id:id,status:news_status,table,field:field},function(data){
+			if(data == 1){
+				layer.msg('操作成功!',{icon:6,time:1000});
+				if(news_status == 1){
+					src="/static/Admin/static/h-ui/images/validform/iconpic-right.png";
+				}else{
+					src="/static/Admin/static/h-ui/images/validform/iconpic-error.png";
+				}
+				$(obj).attr('src',src).attr('onclick',"toggle_status(this,"+id+","+news_status+",'"+table+"','"+field+"')");
+			}else{
+				layer.msg('操作失败了!',{icon:5,time:1000});
+			}
+		});
+	}
+	/*产品-删除*/
+	function member_del(obj,id){
+		layer.confirm('确认要删除吗？',function(index){
+			$.post("/info/info_del",{id:id},function(data){
+				if(data.status == 'y'){
+					layer.msg(data.info,{icon:1,time:3000});
+					$(obj).parents("tr").remove();
+					$("#count").text(data.count);
+				}else{
+					layer.msg(data.info,{icon:2,time:3000});
+				}
+			},'json');
+		});
+	}
+
+	//批量删除
+	function datadel(){
+		var id='';
+		$("input[name='del[]']:checked").each(function(){
+			id += $(this).val()+',';
+		});
+
+		if(id == ''){
+			layer.msg('还没选择!',{icon:2,time:1000});
+			return false;
+		}
+		layer.confirm('确认要删除吗？',function(index){
+			$.post("/info/info_del",{id:id},function(data){
+				if(data.status == 'y'){
+					//循环当前选择的框
+					$("input[name='del[]']:checked").each(function(){
+						//删除当前选择的框
+						$(this).parents('tr').remove();
+					});
+					layer.msg(data.info+'删除数量:'+data.count,{icon:1,time:3000});
+					$("#count").text(data.count);
+				}else{
+					layer.msg(data.info,{icon:2,time:3000});
+				}
+			});
+		});
+	}
+</script>

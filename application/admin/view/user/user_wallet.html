@@ -1,0 +1,151 @@
+{include file="public/header"}
+
+<div class="pd-20">
+    <form action="" method="get">
+        <div class="text-c">
+            注册时间：
+            <input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.start')}" name="start" id="datemin" class="input-text Wdate" style="width:120px;" readonly> -
+            <input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.end')}" name="end" id="datemin" class="input-text Wdate" style="width:120px;" readonly>
+            <input type="hidden"  value="{$ids}" name="id" id="id" class="input-text Wdate" style="width:120px;" readonly>
+            <input type="text" class="input-text" style="width:250px" placeholder="请输入用户手机号" name="mobile" value="{:input('mobile')}">
+            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+        </div>
+    </form>
+    <br>
+    <form action="" method="get">
+        <div class="text-c">
+            从上级添加用户至本团队:
+              <select class="input-text" style="width:150px" id="team" name="team"> 
+                  <option value="0">选择用户</option>
+                  {foreach parent_team as $m}
+                  <option value="{$m.id}">{$m.name}</option>
+                  {/foreach}
+              </select>
+              <button type="button"  class="btn btn-success" id="addteam" name="">添加</button>
+        </div>
+    </form>
+
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l">
+
+        </span>
+        <span class="r">共有数据：<strong id="count">{$list->total()}</strong> 条</span>
+    </div>
+
+    <div class="mt-20">
+        <form action="{:url('rule')}" method="post" id='sort-form'>
+            <table class="table table-border table-bordered table-bg table-hover table-sort">
+                <thead>
+                <tr class="text-c">
+                    <th width="30">头像</th>
+                    <th width="40">ID</th>
+                    <th width="80">昵称</th>
+                    <th width="60">上级ID/手机号</th>
+                    <th width="80">余额</th>
+                    <th width="40">职位</th>
+                    <th width="80">注册时间/<br>入店时间</th>
+                    <th width="30">状态</th>
+                    <th width="120">设置</th>
+                </tr>
+                </thead>
+                <tbody>
+                {foreach name="list" item="v"}
+                <tr class="text-c">
+                    <td style="padding: 0">
+                        {if condition="empty($v.avatar)"}
+                        <img src="/uploads/img/enheng.jpg" style="width: 40px;height: 40px;" onclick="showimg('/uploads/img/enheng.jpg')">
+                        {else/}
+                        <img src="{$v.avatar}" style="width: 40px;height: 40px;" onclick="showimg('{$v.avatar}')">
+                        {/if}
+                    </td>
+                    <td>{$v.id}</td>
+                    <td>{$v.name}</td>
+                    <td>{$v.parent_id}<br>{$v.mobile}</td>
+                    <td>
+                        <span style="float: left">佣金:{:floatval($v.money)}</span><br> 
+                        <span style="float: left">积分:{:floatval($v.td_money)}</span>
+                    </td>
+
+                    <td>
+                        {switch name="$v.boos"}
+                        {case value="1"} <span class="label label-success radius">店长</span>  {/case}
+                        {case value="2"} <span class="label label-primary radius">副店长</span> {/case}
+                        {case value="0"} <span class="label label-default radius">普通</span> {/case}
+                        {/switch}
+                    </td>
+                    <td>{$v.created}<br>
+                        {$v.join_time}
+                    </td>
+                    <td>
+                        <img src="\static\Admin\static\h-ui\images\validform\iconpic-{$v['status']!=1?'right':'error'}.png" style="cursor:pointer;" onclick="tog_status(this,{$v.id},{$v.status},'user','status')">
+                    </td>
+                    <td>
+                        {if condition="$v.boos eq 0"}
+                        <a style="text-decoration:none" class="btn btn-success ml-5" onClick="boos('成为副店长','/user/shopowner?id={$v['id']}')" href="javascript:void(0);" title="编辑">成为副店长</a>
+                        {/if}
+                     </td>
+                </tr>
+                {/foreach}
+                </tbody>
+            </table>
+            <div class="page">
+                {:htmlspecialchars_decode($list->render())}
+            </div>
+        </form>
+    </div>
+</div>
+
+{include file="public/footer"}
+<script>
+    function boos(obj, url, id) {
+        layer.confirm('确认设置该用户为副店长？', function (index) {
+            $.post(url, {id: id}, function (data) {
+                if (data.status == 'y') {
+                    layer.msg(data.info, {icon: 1, time: 1000});
+                    window.location.reload();
+                } else {
+                    layer.msg(data.info, {icon: 2, time: 1000});
+                }
+            }, 'json');
+        });
+    }
+
+    $('#addteam').click(function(){
+        var team = $("#team").val();
+        var id = $("#id").val();
+        if(team == 0){
+            layer.msg('请选择用户', {icon: 2, time: 1000});
+            return false;
+        }
+        layer.confirm('确认添加该用户至本团队？注：如果当前用户团队已满，将会把第一个普通用户挤出，挤出后会在下级团队中成为副店长或者店长，是否确认?', function (index) {
+            $.post("/user/userteam", {id:id,team:team}, function (data) {
+                if (data.status == 'y') {
+                    layer.msg(data.info, {icon: 1, time: 1000});
+                    window.location.reload();
+                } else {
+                    layer.msg(data.info, {icon: 2, time: 1000});
+                }
+            }, 'json');
+        });
+    })
+    	/*显示隐藏切换*/
+	function toggle_status(obj,id,status,table,field){
+		var news_status = status == 1 ? 0 : 1;
+		if(typeof(field) == 'undefined'){
+			field = 'is_show';
+		}
+		$.post("<?php echo url('Base/toggle_status'); ?>",{id:id,status:news_status,table,field:field},function(data){
+			if(data == 1){
+				layer.msg('操作成功!',{icon:6,time:1000});
+				if(news_status != 1){
+					src="/static/Admin/static/h-ui/images/validform/iconpic-right.png";
+				}else{
+					src="/static/Admin/static/h-ui/images/validform/iconpic-error.png";
+				}
+				$(obj).attr('src',src).attr('onclick',"toggle_status(this,"+id+","+news_status+",'"+table+"','"+field+"')");
+			}else{
+				layer.msg('操作失败了!',{icon:5,time:1000});
+			}
+		});
+	}
+</script>

@@ -1,0 +1,163 @@
+{include file="public/header" /}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 系统管理 <span class="c-gray en">&gt;</span> 留言列表 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20"> 
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="l"><a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a>
+        <a href="javascript:;" onClick="new_open('添加/编辑','/system/message_edit?id=0')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加问答</a></span>
+
+        <span class="r">共有数据：<strong id="count">{$count}</strong> 条</span>
+ </div>
+    <div class="mt-20">
+        <div class="page mb-10">
+            {:htmlspecialchars_decode($list->render())}
+        </div>
+        <form action="{:url('rule')}" method="post" id='form-add'>
+            <table class="table table-border table-bordered table-bg table-hover table-sort">
+                <thead>
+                    <tr class="text-c">
+                        <th width="25"><input type="checkbox" name="" value=""></th>
+                        <th width="50">ID</th>
+                        <!--<th width="100">会员</th>-->
+                        <th>内容/回复</th>
+                        <th width="100">反馈时间</th>
+                        <th width="60">管理员</th>
+                        <!--<th width="60">阅读</th>-->
+                        <th width="120">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name="list" item="v"}
+                        <tr class="text-c" id="tr{$v.id}">
+                            <td><input type="checkbox" value="{$v.id}" name="del[]"></td>
+                            <td>{$v.id}</td>
+                            <!--<td><span class="label label-success radius">{$v.uid}</span><br>{$v.username}</td>-->
+                            <td>
+
+                                {if condition="$v.type eq  1 "}
+                                <span style="color: #00a0e9">{$v.content}</span> <br>
+                                <a class="btn btn-primary radius" data-title="后台问答" onclick="new_open('后台问答','/system/message_edit?id={$v['id']}')" href="javascript:;"><i class="Hui-iconfont">&#xe6dc;</i>编辑查看</a>
+                                {else/}
+                                <span style="color: #00a0e9">{$v.content}</span> <br>
+                                {$v.content_admin}
+                                {/if}
+                            </td>
+                            <td>{$v.add_time}</td>
+                            <td>{$v.admin_id}</td>
+                            <!--<td>-->
+                                <!--<img src="/static/Admin/images/icon_{$v['state']==1?'right':'error'}_s.png" style="cursor:pointer;" onclick="toggle_status(this,{$v.id},{$v.state},'message','state')">-->
+                            <!--</td>-->
+                            <td>
+                                {if condition="$v.type eq  0 "}
+                                <a style="text-decoration:none" class="btn btn-success ml-5" onClick="new_open('回复留言','/system/message_add?id={$v['id']}')" href="javascript:void(0);" title="编辑"><i class="Hui-iconfont">&#xe6df;</i></a>
+
+                                {/if}
+
+                                <a style="text-decoration:none" class="btn btn-danger ml-5" onclick="member_del(this,{$v['id']})" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>
+
+                            </td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript">
+    function tog_status(obj,id,status,table,field){
+        var news_status = status == 1 ? 0 : 1;
+        if(typeof(field) == 'undefined'){
+            field = 'is_show';
+        }
+        $.post("<?php echo url('Base/toggle_status'); ?>",{id:id,status:news_status,table,field:field},function(data){
+            if(data == 1){
+                layer.msg('操作成功!',{icon:6,time:1000});
+                if(news_status == 0){
+                    src="/static/Admin/static/h-ui/images/validform/iconpic-error.png";
+                }else{
+                    src="/static/Admin/static/h-ui/images/validform/iconpic-right.png";
+                }
+                $(obj).attr('src',src).attr('onclick',"toggle_status(this,"+id+","+news_status+",'"+table+"','"+field+"')");
+            }else{
+                layer.msg('操作失败了!',{icon:5,time:1000});
+            }
+        });
+    }
+
+    /*显示隐藏切换*/
+    function toggle_status(obj,id,status,table,field){
+        var news_status = status == 1 ? 0 : 1;
+        if(typeof(field) == 'undefined'){
+            field = 'is_show';
+        }
+        $.post("<?php echo url('Base/toggle_status'); ?>",{id:id,status:news_status,table,field:field},function(data){
+            if(data == 1){
+                layer.msg('操作成功!',{icon:6,time:1000});
+                if(news_status == 1){
+                    src="/static/Admin/static/h-ui/images/validform/iconpic-right.png";
+                }else{
+                    src="/static/Admin/static/h-ui/images/validform/iconpic-error.png";
+                }
+                $(obj).attr('src',src).attr('onclick',"toggle_status(this,"+id+","+news_status+",'"+table+"','"+field+"')");
+            }else{
+                layer.msg('操作失败了!',{icon:5,time:1000});
+            }
+        });
+    }
+/*菜单-添加*/
+function article_add(title,url,w,h){
+    layer_show(title,url,w,h);
+}
+
+/*-删除*/
+function member_del(obj,id){
+    layer.confirm('确认要删除吗？',function(index){
+        $.post("/system/message_del",{id:id},function(data){
+            if(data.status == 'y'){
+                //删除自己
+                $(obj).parents("tr").remove();
+                //数量赋值
+                $("#count").text(data.count);
+                layer.msg(data.info,{icon:1,time:1000});
+                //children的长度
+                for(var i=0;i<data.children.length;i++){
+                    $("#tr"+data.children[i]).remove();
+                }
+            }else{
+                layer.msg(data.info,{icon:2,time:1000});
+            }
+        },'json');
+
+    });
+}
+//批量删除
+function datadel(){
+    var id='';
+    $("input[name='del[]']:checked").each(function(){
+        id += $(this).val()+',';
+    });
+
+    if(id == ''){
+        layer.msg('还没选择!',{icon:2,time:1000});
+        return false;
+    }
+    layer.confirm('确认要批量删除吗？',function(index){
+        $.post("/system/message_del",{id:id},function(data){
+            if(data.status == 'y'){
+                //循环当前选择的框
+                $("input[name='del[]']:checked").each(function(){
+                    //删除当前选择的框
+                    $(this).parents('tr').remove();
+                });
+                layer.msg(data.info,{icon:1,time:3000});
+                $("#count").text(data.count);
+            }else{
+                layer.msg(data.info,{icon:2,time:3000});
+            }
+        });
+    });
+}
+</script> 
+</body>
+</html>

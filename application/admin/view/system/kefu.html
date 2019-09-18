@@ -1,0 +1,139 @@
+{include file="public/header" /}
+<style type="text/css">
+.portfolio-area li .portfoliobox{height: 200px;}
+</style>
+<link href="/static/Admin/lib/lightbox2/2.8.1/css/lightbox.css" rel="stylesheet" type="text/css" >
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 图片管理 <span class="c-gray en">&gt;</span> 图片展示 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+	<div class="cl pd-5 bg-1 bk-gray mt-20"> 
+		<span class="l">
+
+			<a href="javascript:;" onclick="member_add('添加图片','/system/kefu_add?type=index')" class="btn btn-primary radius">
+			<i class="Hui-iconfont">&#xe625;</i> 添加类型</a>
+
+			<a href="javascript:;" onclick="datadel()" class="btn btn-danger radius">
+			<i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a> 
+		</span> 
+		<!--<span class="r">共有支付：<strong id="count">{:count($list)}</strong> 位</span> </div>-->
+		<span class="r"></span> </div>
+	<div class="portfolio-content">
+		<ul class="cl portfolio-area">
+			{volist name="list" id="v"}
+				{if condition="$v.type eq 3"}
+					<li class="item" >
+						<div class="portfoliobox">
+							<a style="text-decoration:none" class="ml-5" onClick="member_del(this,{$v.id})" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>
+							<span class="label label-success radius">银行卡</span><br><br>
+							<span>开户名：<p  style="font-size: 12px">{$v.name}</p></span>
+							<span>卡　号：<p  style="font-size: 12px">{$v.yh}</p></span>
+							<span>开户行：<p  style="font-size: 12px">{$v.kh}</p></span>
+							<input class="checkbox" name="del[]" type="checkbox" value="{$v.id}">
+
+						</div>
+					</li>
+				{else/}
+				{if condition="$v.type eq 4"}
+				<li class="item" >
+					<div class="portfoliobox">
+						<a style="text-decoration:none" class="ml-5" onClick="member_del(this,{$v.id})" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>
+						<span class="label label-success radius">微信客服</span><br><br>
+						<span>账号：<p  style="font-size: 12px">{$v.title}</p></span>
+						<input class="checkbox" name="del[]" type="checkbox" value="{$v.id}">
+						<!--<div class="picbox">-->
+							<!--<a href="{$v.thumb}" data-lightbox="gallery" data-title="">-->
+								<!--<img src="{$v.thumb}" style="height: 150px;">-->
+							<!--</a>-->
+						<!--</div>-->
+					</div>
+				</li>
+				{else/}
+					{if condition="$v.type eq 5"}
+					<li class="item" >
+						<div class="portfoliobox" >
+							<a style="text-decoration:none" class="ml-5" onClick="member_del(this,{$v.id})" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>
+							<span class="label label-success radius">QQ客服</span><br><br>
+							<span>账号：<p  style="font-size: 12px">{$v.title}</p></span>
+							<input class="checkbox" name="del[]" type="checkbox" value="{$v.id}">
+							<!--<div class="picbox"><a href="{$v.thumb}" data-lightbox="gallery" data-title="">-->
+								<!--<img src="{$v.thumb}"  style="height: 150px;"></a></div>-->
+						<!--</div>-->
+					</li>
+					{else/}
+					<li class="item">
+						<div class="portfoliobox">
+							<a style="text-decoration:none" class="ml-5" onClick="member_del(this,{$v.id})" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>
+							<span class="label label-success radius"><?php if($v['type']==1){echo '微信';}elseif($v['type']==2){echo '支付宝';}elseif($v['type']==3){echo '银行卡';}elseif($v['type']==4){echo "QQ群客服";}elseif($v['type']==6){echo "微信公众号";}elseif($v['type']==5){echo "充值中心";} ?></span>
+							<span>{$v.title}</span>
+							<input class="checkbox" name="del[]" type="checkbox" value="{$v.id}">
+							<div class="picbox"><a href="{$v.thumb}" data-lightbox="gallery" data-title="">
+								<img src="{$v.thumb}"></a></div>
+						</div>
+					</li>
+					{/if}
+				{/if}
+
+				{/if}
+
+			{/volist}
+		</ul>
+	</div>
+</div>
+{include file="public/footer"}
+<script type="text/javascript" src="/static/Admin/lib/lightbox2/2.8.1/js/lightbox-plus-jquery.min.js"></script> 
+<script type="text/javascript">
+$(function(){
+	$.Huihover(".portfolio-area li");
+});
+/*添加-相册*/
+function member_add(title,url,id,w,h){
+	layer_show(title,url,w,h);
+}
+/*-删除*/
+function member_del(obj,id){
+	layer.confirm('确认要删除吗？',function(index){
+		$.post("/system/kefu_del",{id:id},function(data){
+			if(data.status == 'y'){
+				layer.msg(data.info,{icon:1,time:1000});
+				$(obj).parents("li").remove();
+				$("#count").text(data.count);
+			}else{
+				layer.msg('删除失败',{icon:2,time:1000});
+			}
+		},'json');
+	});
+}
+/* 批量删除 */
+function datadel(){
+ var id='';	
+ $("input[name='del[]']:checked").each(function(){
+ 	id += $(this).val()+',';
+ });
+
+ if(id == ''){
+ 	layer.msg('必须选择一个哦!',{icon:2,time:1000});
+ 	return false;
+ }
+ layer.confirm('确认要删除吗？',function(index){
+ 	$.post("/system/kefu_del",{id:id},function(data){
+			if(data.status == 'y'){
+				$("input[name='del[]']:checked").each(function(){
+					//删除选中的
+ 					$(this).parents('li').remove();
+ 					//children的长度
+					// for(var i=0;i<data.children.length;i++){
+					// 	$("#tr"+data.children[i]).remove();
+					// }
+ 				});
+ 				//数量赋值
+				$("#count").text(data.count);
+				layer.msg(data.info,{icon:1,time:1000});
+			}else{
+				layer.msg(data.info,{icon:2,time:1000});
+			}
+	});
+ });
+}
+</script>
+</body>
+</html>

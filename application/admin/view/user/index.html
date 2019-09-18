@@ -1,0 +1,199 @@
+{include file="public/header"}
+<nav class="breadcrumb">
+    <i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户管理 <span class="c-gray en">&gt;</span> 用户列表
+    <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a>
+</nav>
+
+<div class="pd-20">
+    <form action="" method="get">
+        <div class="text-c">
+
+            注册时间：
+            <input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.start')}" name="start" id="datemin" class="input-text Wdate" style="width:120px;" readonly> -
+            <input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.end')}" name="end" id="datemin" class="input-text Wdate" style="width:120px;" readonly>
+            <input type="text" class="input-text" style="width:250px" placeholder="请输入用户手机号" name="mobile" value="{:input('mobile')}">
+            <span class="select-box inline">
+				<select id="types" name="type" class="select">
+					<option value="0">=用户搜索=</option>
+						<option value="1" {if condition=" input('get.type') eq 1"}selected{/if} >直推</option>
+                    <option value="2" {if condition=" input('get.type') eq 2"}selected{/if} >上级</option>
+				</select>
+            </span>
+            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+
+        </div>
+    </form>
+
+    <div class="cl pd-5 bg-1 bk-gray mt-20"> 
+        <span class="l">
+
+        </span>
+        <span class="r">共有数据：<strong id="count">{$list->total()}</strong> 条</span>
+    </div>
+
+    <div class="mt-20">
+        <form action="{:url('rule')}" method="post" id='sort-form'>
+            <table class="table table-border table-bordered table-bg table-hover table-sort">
+                <thead>
+                    <tr class="text-c">
+                        <th width="30">头像</th>
+                        <th width="30">ID</th>
+                        <th width="80">昵称</th>
+                        <th width="80">手机号</th>
+                        <th width="80">上级ID</th>
+                        <th width="100">余额</th>
+                        <th width="50">直推人数</th>
+                        <th width="30">所在地区</th>
+                        <th width="30">代理区域</th>
+                        <th width="100">时间</th>
+                        <th width="30">会员</th>
+                        <th width="40">是否可登陆</th>
+                        <th width="100">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name="list" item="v"}
+                        <tr class="text-c" >
+                            <td style="padding: 0">
+                                {if condition="empty($v.avatar)"}
+                                <img src="/uploads/img/enheng.jpg" style="width: 40px;height: 40px;" onclick="showimg('/uploads/img/enheng.jpg')">
+                                {else/}
+                                <img src="{$v.avatar}" style="width: 40px;height: 40px;" onclick="showimg('{$v.avatar}')">
+                                {/if}
+
+
+                            </td>
+                            <td>{$v.id}</td>
+                            <td >{$v.name}</td>
+                            <td>{$v.mobile}</td>
+                            <td>{$v.parent_id}</td>
+                            <td style="padding-left: 30px">
+                               <span style="float: left">余额:{:floatval($v.money)}</span><br>
+                               <span style="float: left">豆豆:{:floatval($v.cz_money)}</span><br>
+                            </td>
+                            <td>
+                                会员：{$v.zhi_vip}<br>
+                                普通：{$v.zhi_p}<br>
+                                总计：{$v.zhi_x}
+                            </td>
+                            <td>{$v.address}</td>
+
+                            <td>{$v.agent_level}<br>{$v.agent_id}</td>
+                            <td>注册时间:<span style="font-size: 12px">{$v.created}</span><br>
+                                {if condition="!empty($v.level_end_time)"}
+                                <span style="color: red;">会员时间:</span>
+                                   {$v.level_start_time}-<br>
+                               　　　　 {$v.level_end_time}
+
+                                {/if}
+                            </td>
+                            <td>
+                                {switch name="$v.level"}
+                                {case value="0"} <span class="label label-default radius">普通用户</span> {/case}
+                                {case value="1"} <span class="label label-primary radius">会员</span> {/case}
+                                {/switch}
+                            </td>
+                            <td>
+                                 <img src="/static/Admin/images/icon_{$v['status']!=1?'right':'error'}_s.png" style="cursor:pointer;" onclick="tog_status(this,{$v.id},{$v.status},'user','status')">
+                            </td>
+                            <td>
+                                <a style="text-decoration:none" class="btn btn-secondary radius" onClick="new_open('充值','/user/userrecharge?id={$v['id']}',800,400)" href="javascript:void(0);" title="充值"><i class="Hui-iconfont">充值</i></a>
+                                <a style="text-decoration:none" class="btn btn-success ml-5" onClick="new_open('添加/编辑','/user/useradd?id={$v['id']}')" href="javascript:void(0);" title="编辑"><i class="Hui-iconfont">&#xe6df;</i></a>
+
+                                <!--<a style="text-decoration:none" class="btn btn-danger ml-5" onclick="member_del(this,{$v['id']})" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>-->
+
+                            </td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+            <div class="page">
+                {:htmlspecialchars_decode($list->render())}
+            </div>
+        </form>
+    </div>
+</div>
+
+{include file="public/footer"}
+
+<script>
+    /*产品-删除*/
+    function member_dl(obj,id){
+        layer.confirm('确认升级该用户为代理商？',function(index){
+            $.post("/user/userdl",{id:id},function(data){
+                if(data.status == 'y'){
+                    layer.msg(data.info,{icon:1,time:3000});
+                    window.location.reload()
+                }else{
+                    layer.msg(data.info,{icon:2,time:3000});
+                }
+            },'json');
+        });
+    }
+    var count = 0;
+    /*产品-删除*/
+    function member_num(obj,id){
+        layer.prompt({title: '请输入该用户支付的预付金:'}, function(index){
+            layer.confirm('您输入的预付金为:'+index,function(d){
+                count += 1;
+                if(count >1){
+                    layer.msg('请等待,数据已在处理中...',{icon:1,time:3000});
+                    window.location.reload();
+                    return false;
+                }
+                $.post("/user/usermoney",{id:id,money:index},function(data){
+                    if(data.status == 'y'){
+                        layer.msg(data.info,{icon:1,time:3000});
+                        window.location.reload()
+                    }else{
+                        count = 0;
+                        layer.msg(data.info,{icon:2,time:3000});
+                    }
+                },'json');
+            });
+
+        });
+    }
+    /*产品-删除*/
+    function member_del(obj,id){
+        layer.confirm('确认要删除吗？',function(index){
+            $.post("/user/userdel",{id:id},function(data){
+                if(data.status == 'y'){
+                    layer.msg(data.info,{icon:1,time:3000});
+                    $(obj).parents("tr").remove();
+                    $("#count").text(data.count);
+                }else{
+                    layer.msg(data.info,{icon:2,time:3000});
+                }
+            },'json');
+        });
+    }
+
+    //批量删除
+    function datadel(){
+        var id='';
+        $("input[name='del[]']:checked").each(function(){
+            id += $(this).val()+',';
+        });
+
+        if(id == ''){
+            layer.msg('还没选择!',{icon:2,time:1000});
+            return false;
+        }
+        layer.confirm('确认要删除吗？',function(index){
+            $.post("/user/userdel",{id:id},function(data){
+                if(data.status == 'y'){
+                    //循环当前选择的框
+                    $("input[name='del[]']:checked").each(function(){
+                        //删除当前选择的框
+                        $(this).parents('tr').remove();
+                    });
+                    layer.msg(data.info+'删除数量:'+data.count,{icon:1,time:3000});
+                    $("#count").text(data.count);
+                }else{
+                    layer.msg(data.info,{icon:2,time:3000});
+                }
+            });
+        });
+    }
+</script>

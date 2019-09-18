@@ -1,0 +1,63 @@
+{include file="public/header" /}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 系统管理 <span class="c-gray en">&gt;</span> 操作日志 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+    <form action="" method="get">
+        <div class="text-c">
+             <span class="select-box inline">
+
+                 <select name="type" class="select">
+
+                <option value="">=状态=</option>
+                {foreach $sel as $f}
+						<option value="{$f['jk_name']}" {if condition="input('get.type') eq $f['jk_name']"}selected{/if} >{$f['jk_name']}</option>
+                {/foreach}
+            </select>
+            </span>
+              <input type="text" class="input-text" style="width:250px" placeholder="请输入操作人账号/被操作用户id" name="name" value="{:input('name')}">
+            <button type="submit" class="btn btn-success" id="" name=""><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+        </div>
+    </form>
+    <div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="r">共有数据：<strong id="count">{$count}</strong> 条</span>
+ </div>
+    <div class="mt-20">
+        <form action="" method="post" id='form-add'>
+            <table class="table table-border table-bordered table-bg table-hover table-sort">
+                <thead>
+                    <tr class="text-c">
+                        <th width="20">ID</th>
+                        <th width="20">操作id</th>
+                        <th width="20">操作账号</th>
+                        <th width="60">操作方式</th>
+                        <th width="100">IP</th>
+                        <th width="40">被操作用户</th>
+                        <th width="40">被操作id</th>
+                        <th width="40">相关数量</th>
+                        <th width="150">其他信息</th>
+                        <th width="80">操作时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name="list" item="v"}
+                        <tr class="text-c" id="tr{$v.id}">
+                            <td>{$v.id}</td>
+                            <td>{$v.user_id}</td>
+                            <td>{$v.name}</td>
+                            <td>{$v.jk_name}</td>
+                            <td>{$v.ip}</td>
+                            <td>{$v.Interface_user_id}</td>
+                            <td>{$v.Interface_id}</td>
+                            <td>{$v.money}</td>
+                            <td>{$v.info}</td>
+                            <td>{$v.add_time}</td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+{include file="public/footer"}
+</body>
+</html>

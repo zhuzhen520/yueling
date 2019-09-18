@@ -1,0 +1,133 @@
+{include file="public/header" /}
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 用户管理 <span class="c-gray en">&gt;</span> 商务合作 <a class="btn btn-success radius r mr-20" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+<div class="pd-20">
+	<form action="" method="get">
+		<div class="text-c">
+			日期范围：
+			<input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.start')}" name="start" id="datemin" class="input-text Wdate" style="width:120px;" readonly> -
+			<input type="text" onfocus="WdatePicker({lang:'zh-tw'})" value="{:input('get.end')}" name="end" id="datemin" class="input-text Wdate" style="width:120px;" readonly>
+			<input type="text" class="input-text" style="width:250px" placeholder="姓名|申请id|公司名称" value="{:input('get.word')}" name="word">
+			<button type="submit" class="btn btn-success radius"><i class="Hui-iconfont">&#xe665;</i> 搜索</button>
+		</div>
+	</form>
+
+	<div class="cl pd-5 bg-1 bk-gray mt-20">
+		<span class="r" style="float: right;">共有数据：<strong id="count">{$count}</strong> 条</span>
+	</div>
+	<div class="mt-20">
+		<table class="table table-border table-bordered table-hover table-bg table-sort">
+			<thead>
+			<tr class="text-c">
+				<th width="25"><input type="checkbox" name="" value=""></th>
+				<th width="40">ID</th>
+				<th width="50">申请人id</th>
+				<th width="80">姓名</th>
+				<th width="100">手机号</th>
+				<th width="150">公司名称</th>
+				<th width="150">地址</th>
+				<th width="150">添加时间</th>
+				<th width="50">审核状态</th>
+				<th width="100">编辑</th>
+			</tr>
+			</thead>
+			<tbody>
+			{volist name="list" id="v"}
+			<tr class="text-c" id="tr{$v.id}">
+				<td><input type="checkbox" value="{$v.id}" name="del[]"></td>
+				<td>{$v.id}</td>
+				<td>{$v.userid}</td>
+				<td> {$v.name}</td>
+				<td> {$v.phone}</td>
+				<td> {$v.company}</td>
+				<td> {$v.address}</td>
+				<td>{$v.add_time}</td>
+				<td>
+					{switch name="$v.status"}
+					{case value="0"} <span class="label label-default radius">未审核</span> {/case}
+					{case value="2"} <span class="label label-primary radius">已通过</span> {/case}
+					{case value="1"} <span class="label label-default radius">已驳回</span> {/case}
+					{/switch}
+				</td>
+				<td class="td-manage">
+					{switch name="$v.status"}
+					{case value="0"}
+						<a style="text-decoration:none" class="btn btn-primary ml-5" onclick="member_sta(this,{$v['id']},2)"  href="javascript:void(0);" title="通过"><i class="Hui-iconfont">&#xe615;</i></a>
+						<a style="text-decoration:none" class="btn btn-warning ml-5" onclick="member_sta(this,{$v['id']},1)" title="驳回"><i class="Hui-iconfont">&#xe60b;</i></a>
+					{/case}
+					{/switch}
+				</td>
+			</tr>
+			{/volist}
+			</tbody>
+		</table>
+		<div class="page text-r mt-10">
+			{:htmlspecialchars_decode($list->render())}
+		</div>
+	</div>
+</div>
+{include file="public/footer"}
+<script>
+
+	function member_sta(obj,id,status){
+		var infos = '';
+		if(status == 2){
+			infos = '注：请确认用户是否已缴纳代理费';
+		}else{
+			infos = '是否确认驳回?'
+		}
+		layer.confirm(infos,function(index){
+			$.post("{:url('apply_status')}",{id:id,status:status},function(data){
+				if(data.status == 'y'){
+					layer.msg(data.info,{icon:1,time:1000});
+					window.location.reload();
+				}else{
+					layer.msg(data.info,{icon:2,time:1000});
+				}
+			},'json');
+		});
+	}
+
+	/*产品-删除*/
+	function member_del(obj,id){
+		layer.confirm('确认要删除吗？',function(index){
+			$.post("/info/info_del",{id:id},function(data){
+				if(data.status == 'y'){
+					layer.msg(data.info,{icon:1,time:3000});
+					$(obj).parents("tr").remove();
+					$("#count").text(data.count);
+				}else{
+					layer.msg(data.info,{icon:2,time:3000});
+				}
+			},'json');
+		});
+	}
+
+	//批量删除
+	function datadel(){
+		var id='';
+		$("input[name='del[]']:checked").each(function(){
+			id += $(this).val()+',';
+		});
+
+		if(id == ''){
+			layer.msg('还没选择!',{icon:2,time:1000});
+			return false;
+		}
+		layer.confirm('确认要删除吗？',function(index){
+			$.post("/info/info_del",{id:id},function(data){
+				if(data.status == 'y'){
+					//循环当前选择的框
+					$("input[name='del[]']:checked").each(function(){
+						//删除当前选择的框
+						$(this).parents('tr').remove();
+					});
+					layer.msg(data.info+'删除数量:'+data.count,{icon:1,time:3000});
+					$("#count").text(data.count);
+				}else{
+					layer.msg(data.info,{icon:2,time:3000});
+				}
+			});
+		});
+	}
+</script>

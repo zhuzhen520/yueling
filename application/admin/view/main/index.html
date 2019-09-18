@@ -1,0 +1,71 @@
+{include file="public/header" /}
+<header class="navbar-wrapper" style="height:55px;">
+	<div class="navbar navbar-fixed-top" style="height:55px;">
+		<div class="container-fluid cl" style="height:55px;"> <a class="logo navbar-logo f-l mr-10 hidden-xs" href="#" style="    height: 54px;
+    line-height: 54px">{:env('app.name')}</a> <a  class="logo navbar-logo-m f-l mr-10 visible-xs" href="#"></a>
+			<span class="logo navbar-slogan f-l mr-10 hidden-xs"></span>
+			<a aria-hidden="false" class="nav-toggle Hui-iconfont visible-xs" href="javascript:;">&#xe667;</a>
+
+			<nav id="Hui-userbar" class="nav navbar-nav navbar-userbar hidden-xs">
+				<ul class="cl">
+					<li style="height: 54px;line-height: 54px">{$admin.nickname}</li>
+					<li class="dropDown dropDown_hover" style="height: 54px;line-height: 54px">
+						<a href="#" class="dropDown_A">操作 <i class="Hui-iconfont">&#xe6d5;</i></a>
+						<ul class="dropDown-menu menu radius box-shadow">
+							<li><a href="/index/logout">退出</a></li>
+						</ul>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</header>
+<aside class="Hui-aside" style="background-color: #333">{include file="public/menu" /}</aside>
+
+<div class="dislpayArrow hidden-xs"><a class="pngfix" href="javascript:void(0);" onClick="displaynavbar(this)"></a></div>
+<section class="Hui-article-box" style="top:54px;">
+	<div id="Hui-tabNav" class="Hui-tabNav hidden-xs">
+		<div class="Hui-tabNav-wp">
+			<ul id="min_title_list" class="acrossTab cl">
+				<li class="active">
+					<span title="我的桌面" data-href="/main/welcome">我的桌面</span>
+					<em></em>
+				</li>
+			</ul>
+		</div>
+		<div class="Hui-tabNav-more btn-group"><a id="js-tabNav-prev" class="btn radius btn-default size-S" href="javascript:;"><i class="Hui-iconfont">&#xe6d4;</i></a><a id="js-tabNav-next" class="btn radius btn-default size-S" href="javascript:;"><i class="Hui-iconfont">&#xe6d7;</i></a></div>
+	</div>
+	<div id="iframe_box" class="Hui-article">
+		<div class="show_iframe">
+			<div style="display:none" class="loading"></div>
+			<iframe id="iframe-welcome" data-scrolltop="0" scrolling="yes" frameborder="0" src="/main/welcome"></iframe>
+		</div>
+	</div>
+</section>
+
+<div class="contextMenu" id="Huiadminmenu">
+	<ul>
+		<li id="closethis">关闭当前 </li>
+		<li id="closeall">关闭全部 </li>
+	</ul>
+</div>
+{include file="public/footer" /}
+<style>
+	.Hui-aside .menu_dropdown > dl > dd > ul > li > a{
+		background: #333;
+		height: 40px;
+		line-height: 40px;
+		padding-left: 30px;
+	}
+	.Hui-aside .menu_dropdown > dl > dd > ul > li.current > a{
+		background: rgb(97,100,109);
+		height: 40px;
+		line-height: 40px;
+		padding-left: 30px;
+	}
+	.Hui-aside .menu_dropdown dl > dt{
+		height: 45px;
+		line-height: 45px;
+		padding-left: 30px
+	}
+</style>

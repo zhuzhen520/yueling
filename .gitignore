@@ -1,0 +1,12 @@
+/.idea
+/.vscode
+/vendor
+/extend
+runtime 
+public
+/runtime 
+*.log
+thinkphp
+.env
+.DS_Store
+.idea/workspace.xml
