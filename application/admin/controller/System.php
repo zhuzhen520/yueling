@@ -349,6 +349,7 @@ class System extends Base{
         $lists = $list->paginate(Env::get('app.page'), false, ['query' => $this->request->param()])
             ->each(function ($item){
                 $item['add_time'] = date('Y-m-d H:i:s',$item['add_time']);
+                $item['username'] = Db::name('user')->where('id',$item['Interface_user_id'])->value('mobile');
                 return $item;
             });
         return view('', [

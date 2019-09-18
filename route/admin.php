@@ -17,7 +17,7 @@ Route::domain(Env::get('app.admin_url'), function () {
     })->prefix('admin/index');
 
     /**
-     * 欢迎页面
+     * 欢迎页面operation
      */
     Route::group('main', function () {
         Route::get('index', '/index');  //基础页面,
