@@ -1295,6 +1295,12 @@ class User extends Base
             if ($info) {
                 return $this->succ($info);
             } else {
+                $usermoney = $this->userinfo()['money'];
+                $ident_money = get_config('user', 'identmoney');
+                if (floatval($usermoney) < floatval($ident_money)) {
+
+                    return $this->fail('余额不足，请先充值', false, 2);
+                }
                 return $this->fail([], false);
             }
 
